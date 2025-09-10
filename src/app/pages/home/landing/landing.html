@@ -1,0 +1,126 @@
+<p-carousel
+  [value]="products"
+  [circular]="true"
+  [responsiveOptions]="responsiveOptions"
+  [autoplayInterval]="3000"
+  [numVisible]="3"
+  [numScroll]="1"
+>
+  <ng-template let-product #item>
+    <div
+      class="flex h-[50vh] md:h-[40vh] lg:h-[60vh] xl:h-[80vh] w-full items-center justify-center relative"
+    >
+      <div id="zc--carousel-img" class="relative">
+        <img [ngSrc]="product" fill alt="catalogo-medias-zc" priority />
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>
+
+<div class="flex flex-col gap-14 items-center overflow-hidden px-16 pb-8">
+  <section id="categories" class="w-full flex flex-col items-center gap-4 mb-8">
+    <h2 class="font-bold text-3xl my-12">Categorías</h2>
+    <div class="w-full flex flex-wrap gap-8 items-center justify-center md:justify-evenly">
+      @for (category of categories; track $index) {
+      <app-category-card
+        [imageSrc]="category.imageSrc"
+        [title]="category.title"
+        [url]="category.url"
+        [enterClass]="category.enterClass"
+        [leaveClass]="category.leaveClass"
+      ></app-category-card>
+      }
+    </div>
+  </section>
+
+  <section
+    id="tips"
+    class="w-full flex flex-wrap items-center justify-center md:justify-evenly gap-8"
+  >
+    <div class="flex flex-col gap-12">
+      <h2 class="font-bold text-4xl mb-2 text-center">Tips Útiles</h2>
+      <div class="flex flex-wrap gap-8 items-center justify-center">
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-l-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-r-8 animate-duration-1000"
+          class="flex shadow-xl rounded-2xl overflow-hidden h-[15rem] md:h-[20rem] w-[15rem] md:w-[20rem] relative"
+        >
+          <img src="landing/v.carousel_7.jpg" alt="catalogo-medias-zc" class="zc--tip" />
+          <div
+            class="zc--bg-tip bg-cyan-50/50 absolute rounded-2xl inset-shadow-sm inset-shadow-stone-500/50 flex justify-center items-center p-12"
+          >
+            <h4 class="text-center md:text-lg">¿Cómo escoger el color correctamente?</h4>
+          </div>
+        </div>
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+          class="flex shadow-xl rounded-2xl overflow-hidden h-[15rem] md:h-[20rem] w-[15rem] md:w-[20rem] relative"
+        >
+          <img src="landing/IMG_0322.JPG" alt="catalogo-medias-zc" class="zc--tip" />
+          <div
+            class="zc--bg-tip bg-cyan-50/50 absolute rounded-2xl inset-shadow-sm inset-shadow-stone-500/50 flex justify-center items-center p-12"
+          >
+            <h4 class="text-center md:text-lg">
+              ¿Cómo combinar las medias para lograr el look ideal?
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col items-center justify-center gap-8">
+      <div
+        pAnimateOnScroll
+        [once]="false"
+        enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+        leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+        class="flex gap-8 items-center justify-center"
+      >
+        <img src="/icons/envios.svg" alt="Envíos rápidos" class="h-[10rem] w-[10rem]" />
+        <span class="text-center text-2xl w-24">Envíos rápidos</span>
+      </div>
+      <div
+        pAnimateOnScroll
+        [once]="false"
+        enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+        leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+        class="flex gap-8 items-center justify-center"
+      >
+        <img src="/icons/pagos-seguros.svg" alt="Pagos seguros" class="h-[10rem] w-[10rem]" />
+        <span class="text-center text-2xl w-24">Pagos seguros</span>
+      </div>
+    </div>
+  </section>
+
+  <div
+    pAnimateOnScroll
+    [once]="false"
+    enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+    leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+    class="flex flex-wrap gap-8"
+  >
+    <p-image
+      src="landing/IMG_0322.JPG"
+      alt="catalogo-medias-zc"
+      class="landing h-[20rem] md:mr-[-4rem] md:mt-8"
+    />
+    <p-image src="landing/IMG_0319.JPG" alt="catalogo-medias-zc" class="landing h-[20rem]" />
+
+    <div class="md:w-[50%]">
+      <h2 class="font-bold text-4xl mb-2">Medias malla profesionales</h2>
+      <p class="text-xl">
+        Es un tejido altamente elástico (flexible en cuatro direcciones). Ofrece gran elasticidad y
+        recuperación, buena fuerza, ​resistencia y por supuesto proporciona comodidad y protección
+        para la piel.
+      </p>
+    </div>
+  </div>
+  <video src="landing/presentation.mov" width="720" controls poster="vistaprevia.jpg" autoplay loop preload="metadata" muted>
+    Lo sentimos. Este vídeo no puede ser reproducido en tu navegador.<br />
+    La versión descargable está disponible en <a href="landing/presentation.mov">Enlace</a>.
+  </video>
+</div>

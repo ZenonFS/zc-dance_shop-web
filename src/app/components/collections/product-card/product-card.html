@@ -1,0 +1,37 @@
+<div
+  id="zc--img-container"
+  class="relative h-[20rem] flex items-center justify-center justify-content-center overflow-hidden"
+>
+  @if (imageUrl) {
+  <ng-container>
+    <img [src]="imageUrl" alt="zc--bg" class="block w-full object-cover z-100" />
+    <img [src]="imageUrl" alt="zc--bg-blur" class="zc--bg-blur absolute object-cover blur-md" />
+  </ng-container>
+  } @else {
+  <p-skeleton height="20rem" />
+  }
+  <p-button
+    id="add-product"
+    aria-label="Agregar al carrito"
+    label="Agregar al carrito"
+    icon="pi pi-shopping-bag"
+    class="z-100"
+    (onClick)="addProductToCart()"
+  ></p-button>
+</div>
+<div id="details" class="flex flex-col p-6 gap-2">
+  @if (name) {
+  <span class="font-bold text-xl">{{ name }}</span>
+  } @else {
+  <p-skeleton />
+  } @if (price) {
+  <span>{{ price | currency }}</span>
+  } @else {
+  <p-skeleton width="10rem" height="3rem" />
+  } @if (description) {
+  <p [innerHTML]="description"></p>
+  } @else {
+  <p-skeleton width="20rem" height="10rem" />
+
+  }
+</div>

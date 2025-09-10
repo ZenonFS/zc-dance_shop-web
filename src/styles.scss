@@ -1,0 +1,43 @@
+@use 'tailwindcss';
+@plugin "tailwindcss-primeui";
+
+@font-face {
+  font-family: 'Lovelo';
+  src: url('/fonts/lovelo/Lovelo-Black.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Advent Pro';
+  src: url('/fonts/Advent_Pro/AdventPro-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+
+@theme {
+  --font-lovelo: Lovelo, sans-serif;
+  --font-advent-pro: 'Advent Pro', sans-serif;
+  --font-display: Lovelo, sans-serif;
+  --font-sans: Lovelo, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p, span {
+  font-family: 'Advent Pro', sans-serif;
+}
+
+h2 {
+  color: var(--p-primary-color);
+}

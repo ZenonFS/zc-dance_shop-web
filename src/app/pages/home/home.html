@@ -1,0 +1,139 @@
+<div class="flex p-1 w-full bg-black items-center justify-center">
+  <span class="text-white text-center font-bold">Envíos GRATIS por compras superiores a $400.000</span>
+</div>
+<p-menubar [model]="items">
+  <ng-template #start>
+    <div
+      class="flex justify-center items-center"
+      (click)="navigateToHome()"
+      (keydown)="navigateToHome()"
+    >
+      <div
+        class="relative flex items-center justify-center justify-content-center overflow-hidden h-16 w-14"
+      >
+        <img src="LOGO_ZC.png" alt="catalogo-medias-zc" loading="lazy" />
+      </div>
+      <h1 class="ml-3 font-bold text-2xl" (click)="navigateToHome()" (keydown)="navigateToHome()">
+        Dance Shop
+      </h1>
+    </div>
+  </ng-template>
+  <ng-template #item let-item let-root="root">
+    <a
+      pRipple
+      class="flex items-center p-menubar-item-link"
+      [routerLink]="item.url"
+      [href]="item.url"
+      [fragment]="item.fragment"
+      [queryParams]="item.queryParams"
+    >
+      <span class="text-lg">{{ item.label }}</span>
+
+      @if (item.shortcut) {
+      <span
+        class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
+        >{{ item.shortcut }}</span
+      >
+      } @if (item.items) {
+      <i [ngClass]="['ml-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
+      }
+    </a>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex items-center gap-2">
+      <!-- <p-button
+        icon="pi pi-user"
+        id="user-btn"
+        title="User"
+        variant="text"
+        (onClick)="navigateToAuth()"
+      /> -->
+      <p-button
+        icon="pi pi-shopping-bag"
+        id="shopping-bag-btn"
+        title="shopping bag"
+        variant="text"
+        (click)="visible = true"
+        (keydown)="visible = true"
+      />
+    </div>
+  </ng-template>
+</p-menubar>
+
+<p-drawer [(visible)]="visible" position="right">
+  <ng-template #header>
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-2 items-center">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="font-bold">Tu Carrito</span>
+      </div>
+      <span class="text-xs">Revisa tus productos antes de continuar.</span>
+    </div>
+  </ng-template>
+
+  @if (cart.cartTotalProducts !== 0) {
+  <div class="flex items-center rounded-xl bg-[#f1f1f1] p-2 gap-2 mb-2 justify-between">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-box"></i>
+      <span>{{ cart.cartTotalProducts }} productos</span>
+    </div>
+    <span>{{ cart.cartTotalPrice | currency }}</span>
+  </div>
+
+  @for (product of cart.products; track $index) {
+  <app-product-cart [product]="product"></app-product-cart>
+  }
+
+  <ng-template #footer>
+    <div class="flex items-center gap-2">
+      <button
+        pButton
+        label="Finalizar compra"
+        aria-label="Finalizar compra"
+        icon="pi pi-shopping-bag"
+        class="w-full"
+        outlined
+      ></button>
+    </div>
+  </ng-template>
+  }
+</p-drawer>
+
+<router-outlet />
+<p-button
+  id="whatsapp"
+  class="fixed right-5 bottom-[calc(20px+44px+1rem)] md:bottom-20 z-[1000]"
+  icon="pi pi-whatsapp"
+  [rounded]="true"
+  severity="success"
+  (click)="openWhatsapp()"
+  (keyDown)="openWhatsapp()"
+  pTooltip="WhatsApp"
+  tooltipPosition="left"
+/>
+<p-scrolltop [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }" />
+<footer class="flex flex-col w-full justify-between inset-shadow-sm inset-shadow-cyan-500/50">
+  <div class="flex flex-wrap gap-8 justify-center items-center p-8">
+    <div
+      class="flex w-full md:w-[35%] justify-center items-center gap-2"
+      (click)="openInstagram()"
+      (keydown)="openInstagram()"
+    >
+      <i class="pi pi-instagram text-4xl"></i>
+      <h4 class="text-2xl pointer">@medias.zc</h4>
+    </div>
+    <p-image src="LOGO_ZC_BW.png" alt="catalogo-medias-zc" width="150" />
+    <div
+      class="flex w-full md:w-[35%] justify-center items-center gap-2"
+      (click)="openWhatsapp()"
+      (keydown)="openWhatsapp()"
+    >
+      <i class="pi pi-whatsapp text-4xl"></i>
+      <h4 class="text-2xl">+57 (300) 166-3860</h4>
+    </div>
+  </div>
+  <div class="flex justify-between items-center p-1">
+    <span class="text-sm">© 2025 ZC Dance Shop. Todos los derechos reservados.</span>
+    <span class="text-sm">Desarrollado por Zenon con ❤️</span>
+  </div>
+</footer>

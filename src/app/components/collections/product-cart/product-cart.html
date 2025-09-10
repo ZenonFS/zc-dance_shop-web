@@ -1,0 +1,20 @@
+<div class="flex flex-col items-center rounded-xl bg-[#f1f1f1] p-2 gap-2 mb-2 justify-between">
+  @if (product.imageUrl) {
+  <div class="flex items-center gap-2">
+    <p-image
+      [src]="product.imageUrl"
+      alt="Alt"
+      appendTo="body"
+      height="1rem"
+      class="block w-full object-cover"
+      />
+    <span class="font-bold">{{ product.name }}</span>
+  </div>
+  <div class="flex gap-4">
+    <span>{{ product.price | currency }}</span>
+    <span>{{ product.amount }} productos</span>
+  </div>
+  } @else {
+  <p-skeleton height="20rem" />
+  }
+</div>

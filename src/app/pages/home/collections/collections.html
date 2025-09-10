@@ -1,0 +1,47 @@
+<div class="flex flex-col px-16 py-8 gap-6">
+  <div class="flex flex-wrap bg-[#F1F1F1] rounded-xl p-8 gap-2">
+    <form class="flex flex-wrap gap-2 w-full">
+      <p-selectbutton
+        [options]="colors"
+        [optionValue]="selectedColor"
+        [multiple]="true"
+        optionLabel="name"
+        optionValue="value"
+        class="h-fit"
+      />
+      <p-selectbutton
+        [options]="sizes"
+        [optionValue]="selectedSize"
+        [multiple]="true"
+        optionLabel="name"
+        optionValue="value"
+        class="h-fit"
+      />
+      <p-select
+        [options]="types"
+        [optionValue]="selectedType"
+        (onChange)="onChangeFilter($event, '')"
+        optionLabel="name"
+        optionValue="value"
+        placeholder="Categorias"
+        class="w-full md:w-max h-fit"
+      />
+    </form>
+  </div>
+
+  <div class="flex justify-between items-center">
+    <span class="text-2xl font-bold">Colección</span>
+    <span class="text-sm">Mostrando {{ totalProducts }} resultados</span>
+  </div>
+
+  <div class="flex justify-center gap-8 flex-wrap">
+    @for (product of products; track $index) {
+    <app-product-card
+      [name]="product.name"
+      [description]="product.description"
+      [price]="product.price"
+      [imageUrl]="product.imageUrl"
+    ></app-product-card>
+    }
+  </div>
+</div>

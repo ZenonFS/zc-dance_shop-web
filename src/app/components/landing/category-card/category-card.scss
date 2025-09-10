@@ -1,0 +1,12 @@
+.ver-mas {
+  display: inline-block;
+  text-decoration: underline 0.10em rgba(0, 0, 0, 0);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 300ms, text-underline-offset 300ms;
+  cursor: pointer;
+}
+
+.ver-mas:hover {
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.4em;
+}

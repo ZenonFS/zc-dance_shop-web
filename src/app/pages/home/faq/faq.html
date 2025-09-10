@@ -1,0 +1,29 @@
+<div class="flex flex-col p-4 items-center justify-center">
+  <h2 class="text-4xl text-center my-4">Preguntas Frecuentes</h2>
+  <p-inputgroup class="md:w-200">
+    <p-inputgroup-addon>
+      <i class="pi pi-search"></i>
+    </p-inputgroup-addon>
+    <input pInputText [(ngModel)]="text" placeholder="Buscar..." />
+  </p-inputgroup>
+</div>
+<div class="flex mb-4 gap-2 justify-end">
+    @for (faq of faqs; track $index) {
+      <p-button (onClick)="activeIndex = $index" [rounded]="true" label="1" styleClass="w-8 h-8 p-0" [outlined]="activeIndex !== $index" />
+    }
+    </div>
+<div class="py-20 px-40 card flex justify-center">
+  <p-accordion [(value)]="activeIndex">
+    @for (faq of faqs; track $index) {
+    <p-accordion-panel [value]="faq.id">
+      <p-accordion-header>{{ faq.title }}</p-accordion-header>
+      <p-accordion-content>
+        <p class="m-0">
+          {{ faq.description }}
+        </p>
+      </p-accordion-content>
+    </p-accordion-panel>
+  }
+  </p-accordion>
+
+</div>

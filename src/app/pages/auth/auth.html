@@ -1,0 +1,20 @@
+<div class="mb-4 p-8 flex items-center justify-center">
+  <p-card [style]="{ width: '20rem', overflow: 'hidden' }">
+    <ng-template #header>
+      <!-- <img alt="Card" class="w-full" src="/catalogo-medias-zc.png" /> -->
+      <img alt="Card" class="w-full" src="/logo.svg" />
+    </ng-template>
+    <ng-template #title> Inicio de Sesión </ng-template>
+
+    <div class="flex flex-col gap-4">
+      <input pButtonLabel="Usuario" type="text" pInputText class="w-full" [(ngModel)]="username" />
+      <p-password label="Contraseña" [feedback]="false" [toggleMask]="true" id="password" [(ngModel)]="password" />
+    </div>
+
+    <ng-template #footer>
+      <div class="flex gap-4 mt-1">
+        <p-button aria-label="Iniciar Sesión" label="Iniciar Sesión" class="w-full" styleClass="w-full" (onClick)="login()" />
+      </div>
+    </ng-template>
+  </p-card>
+</div>
