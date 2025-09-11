@@ -17,7 +17,7 @@
   </ng-template>
 </p-carousel>
 
-<div class="flex flex-col gap-14 items-center overflow-hidden px-16 pb-8">
+<div class="flex flex-col gap-20 items-center overflow-hidden px-16 pb-8">
   <section id="categories" class="w-full flex flex-col items-center gap-4 mb-8">
     <h2 class="font-bold text-3xl my-12">Categorías</h2>
     <div class="w-full flex flex-wrap gap-8 items-center justify-center md:justify-evenly">
@@ -96,30 +96,95 @@
     </div>
   </section>
 
+  <section id="preview">
+    <div class="lg:w-[45%] flex">
+      <div
+        pAnimateOnScroll
+        [once]="false"
+        enterClass="animate-enter fade-in-10 slide-in-from-l-8 animate-duration-1000"
+        leaveClass="animate-leave fade-out-10 slide-in-from-r-8 animate-duration-1000"
+        class="relative mr-[-4rem] lg:mr-[-2rem]"
+      >
+        <img src="landing/preview-left.JPG" alt="catalogo-medias-zc" class="landing mt-20 md:mt-10" />
+      </div>
+
+      <div class="flex flex-col w-[50%] lg:w-full">
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+          class="zc--title zc--title-left"
+        >
+          <h2 class="font-bold text-xl lg:text-4xl">Medias malla profesionales</h2>
+        </div>
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+          class="zc--desc"
+        >
+          <i class="pi pi-arrow-left"></i>
+          <p class="md:text-xl">80% Nylon<br />20% Spandex</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:w-[45%] flex">
+      <div class="flex flex-col items-end w-[50%] lg:w-full">
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+          class="zc--title zc--title-right"
+        >
+          <h2 class="font-bold text-xl lg:text-4xl">Medias veladas efecto Beyoncé</h2>
+        </div>
+        <div
+          pAnimateOnScroll
+          [once]="false"
+          enterClass="animate-enter fade-in-10 slide-in-from-l-8 animate-duration-1000"
+          leaveClass="animate-leave fade-out-10 slide-in-from-r-8 animate-duration-1000"
+          class="zc--desc justify-end"
+        >
+          <p class="md:text-xl">70 DEN</p>
+          <i class="pi pi-arrow-right"></i>
+        </div>
+      </div>
+
+      <div
+        pAnimateOnScroll
+        [once]="false"
+        enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
+        leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
+        class="relative  ml-[-4rem] lg:ml-[-2rem]"
+      >
+        <img src="landing/preview-right.jpeg" alt="catalogo-medias-zc" class="landing mt-20 md:mt-10" />
+      </div>
+    </div>
+  </section>
+
   <div
     pAnimateOnScroll
     [once]="false"
-    enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
-    leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
-    class="flex flex-wrap gap-8"
+    enterClass="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
+    leaveClass="animate-leave fade-out-10 zoom-out-50 animate-duration-1000"
+    class="lg:mt-[-15rem]"
   >
-    <p-image
-      src="landing/IMG_0322.JPG"
-      alt="catalogo-medias-zc"
-      class="landing h-[20rem] md:mr-[-4rem] md:mt-8"
-    />
-    <p-image src="landing/IMG_0319.JPG" alt="catalogo-medias-zc" class="landing h-[20rem]" />
-
-    <div class="md:w-[50%]">
-      <h2 class="font-bold text-4xl mb-2">Medias malla profesionales</h2>
-      <p class="text-xl">
-        Es un tejido altamente elástico (flexible en cuatro direcciones). Ofrece gran elasticidad y
-        recuperación, buena fuerza, ​resistencia y por supuesto proporciona comodidad y protección
-        para la piel.
-      </p>
-    </div>
+    <img src="icons/calidad-garantizada.svg" alt="calidad-garantizada" class="w-40" />
+    <h3 class="text-2xl text-center">Calidad<br />Garantizada</h3>
   </div>
-  <video src="landing/presentation.mov" width="720" controls poster="vistaprevia.jpg" autoplay loop preload="metadata" muted>
+  <video
+    src="landing/presentation.mov"
+    controls
+    poster="landing/v.carousel_6.jpg"
+    autoplay
+    loop
+    preload="metadata"
+    muted
+  >
     Lo sentimos. Este vídeo no puede ser reproducido en tu navegador.<br />
     La versión descargable está disponible en <a href="landing/presentation.mov">Enlace</a>.
   </video>

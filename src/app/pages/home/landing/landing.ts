@@ -37,21 +37,21 @@ export class Landing {
     leaveClass: string;
   }[] = [
     {
-      imageSrc: '/landing/IMG_0318.JPG',
+      imageSrc: '/landing/category-senior.jpg',
       title: 'Medias profesionales adulto',
       url: '/collections?t=medias-profesionales-adulto',
       enterClass: 'animate-enter fade-in-10 zoom-in-50 animate-duration-1000',
       leaveClass: 'animate-enter fade-out-10 zoom-out-50 animate-duration-1000',
     },
     {
-      imageSrc: '/landing/IMG_0316.JPG',
+      imageSrc: '/landing/category-others.png',
       title: 'Accesorios',
       url: '/collections?t=accesorios',
       enterClass: 'animate-enter fade-in-10 zoom-in-75 animate-duration-1000',
       leaveClass: 'animate-enter fade-out-10 zoom-out-75 animate-duration-1000',
     },
     {
-      imageSrc: '/landing/IMG_0321.JPG',
+      imageSrc: '/landing/category-junior.png',
       title: 'Medias profesionales junior',
       url: '/collections?t=medias-profesionales-junior',
       enterClass: 'animate-enter fade-in-10 zoom-in-50 animate-duration-1000',
