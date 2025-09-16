@@ -1,10 +1,10 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
-import { AnimateOnScrollModule } from 'primeng/animateonscroll';
-import { CarouselModule } from 'primeng/carousel';
 import { ImageModule } from 'primeng/image';
 import { SkeletonModule } from 'primeng/skeleton';
-import { CategoryCard } from '../../../components/landing/category-card/category-card';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
+import { CarouselModule, CarouselResponsiveOptions } from 'primeng/carousel';
+import { CategoryCard } from '@/app/components/landing/category-card/category-card';
 
 @Component({
   selector: 'app-landing',
@@ -15,19 +15,20 @@ import { CategoryCard } from '../../../components/landing/category-card/category
     CarouselModule,
     SkeletonModule,
     CategoryCard,
-    NgOptimizedImage
+    NgOptimizedImage,
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
-export class Landing {
-  products: any[] = [
-    'landing/v.carousel_6.jpg',
-    'landing/v.carousel_7.jpg',
-    'landing/v.carousel_8.jpg',
-    'landing/v.carousel_9.jpg',
+export class Landing implements OnInit {
+  products: string[] = [
+    'landing/v.carousel_1.JPG',
+    'landing/v.carousel_2.jpeg',
+    'landing/v.carousel_3.jpeg',
+    'landing/v.carousel_4.jpeg',
+    'landing/v.carousel_5.jpeg',
   ];
-  responsiveOptions: any[] | undefined;
+  responsiveOptions: CarouselResponsiveOptions[] | undefined;
 
   categories: {
     imageSrc: string;
@@ -38,7 +39,7 @@ export class Landing {
   }[] = [
     {
       imageSrc: '/landing/category-senior.jpg',
-      title: 'Medias profesionales adulto',
+      title: 'Medias profesionales - Adulto',
       url: '/collections?t=medias-profesionales-adulto',
       enterClass: 'animate-enter fade-in-10 zoom-in-50 animate-duration-1000',
       leaveClass: 'animate-enter fade-out-10 zoom-out-50 animate-duration-1000',
@@ -52,7 +53,7 @@ export class Landing {
     },
     {
       imageSrc: '/landing/category-junior.png',
-      title: 'Medias profesionales junior',
+      title: 'Medias profesionales - Infantil',
       url: '/collections?t=medias-profesionales-junior',
       enterClass: 'animate-enter fade-in-10 zoom-in-50 animate-duration-1000',
       leaveClass: 'animate-enter fade-out-10 zoom-out-50 animate-duration-1000',
