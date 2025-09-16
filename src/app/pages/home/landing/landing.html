@@ -17,7 +17,7 @@
   </ng-template>
 </p-carousel>
 
-<div class="flex flex-col gap-20 items-center overflow-hidden px-16 pb-8">
+<div class="flex flex-col gap-20 items-center overflow-hidden px-8 sm:px-12 md:px-16 pb-8">
   <section id="categories" class="w-full flex flex-col items-center gap-4 mb-8">
     <h2 class="font-bold text-3xl my-12">Categorías</h2>
     <div class="w-full flex flex-wrap gap-8 items-center justify-center md:justify-evenly">
@@ -96,6 +96,18 @@
     </div>
   </section>
 
+
+  <div
+    pAnimateOnScroll
+    [once]="false"
+    enterClass="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
+    leaveClass="animate-leave fade-out-10 zoom-out-50 animate-duration-1000"
+    class="lg:mb-[-30rem] lg:mt-[15rem]"
+  >
+    <img src="icons/calidad-garantizada.svg" alt="calidad-garantizada" class="w-40" />
+    <h3 class="text-2xl text-center">Calidad<br />Garantizada</h3>
+  </div>
+
   <section id="preview">
     <div class="lg:w-[45%] flex">
       <div
@@ -105,7 +117,11 @@
         leaveClass="animate-leave fade-out-10 slide-in-from-r-8 animate-duration-1000"
         class="relative mr-[-4rem] lg:mr-[-2rem]"
       >
-        <img src="landing/preview-left.JPG" alt="catalogo-medias-zc" class="landing mt-20 md:mt-10" />
+        <img
+          src="landing/preview-left.JPG"
+          alt="catalogo-medias-zc"
+          class="landing mt-15 md:mt-10"
+        />
       </div>
 
       <div class="flex flex-col w-[50%] lg:w-full">
@@ -116,7 +132,7 @@
           leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
           class="zc--title zc--title-left"
         >
-          <h2 class="font-bold text-xl lg:text-4xl">Medias malla profesionales</h2>
+          <h2 class="font-bold text-lg md:text-xl lg:text-2xl">Medias malla profesionales</h2>
         </div>
         <div
           pAnimateOnScroll
@@ -140,7 +156,7 @@
           leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
           class="zc--title zc--title-right"
         >
-          <h2 class="font-bold text-xl lg:text-4xl">Medias veladas efecto Beyoncé</h2>
+          <h2 class="font-bold text-lg md:text-xl lg:text-2xl">Medias veladas efecto Beyoncé</h2>
         </div>
         <div
           pAnimateOnScroll
@@ -159,31 +175,26 @@
         [once]="false"
         enterClass="animate-enter fade-in-10 slide-in-from-r-8 animate-duration-1000"
         leaveClass="animate-leave fade-out-10 slide-in-from-l-8 animate-duration-1000"
-        class="relative  ml-[-4rem] lg:ml-[-2rem]"
+        class="relative ml-[-4rem] lg:ml-[-2rem]"
       >
-        <img src="landing/preview-right.jpeg" alt="catalogo-medias-zc" class="landing mt-20 md:mt-10" />
+        <img
+          src="landing/preview-right.jpeg"
+          alt="catalogo-medias-zc"
+          class="landing mt-22 sm:mt-20 md:mt-10"
+        />
       </div>
     </div>
   </section>
 
-  <div
-    pAnimateOnScroll
-    [once]="false"
-    enterClass="animate-enter fade-in-10 zoom-in-50 animate-duration-1000"
-    leaveClass="animate-leave fade-out-10 zoom-out-50 animate-duration-1000"
-    class="lg:mt-[-15rem]"
-  >
-    <img src="icons/calidad-garantizada.svg" alt="calidad-garantizada" class="w-40" />
-    <h3 class="text-2xl text-center">Calidad<br />Garantizada</h3>
-  </div>
   <video
     src="landing/presentation.mov"
     controls
     poster="landing/v.carousel_6.jpg"
-    autoplay
-    loop
     preload="metadata"
+    playsInline
+    autoPlay
     muted
+    loop
   >
     Lo sentimos. Este vídeo no puede ser reproducido en tu navegador.<br />
     La versión descargable está disponible en <a href="landing/presentation.mov">Enlace</a>.

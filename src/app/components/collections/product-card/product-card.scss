@@ -8,7 +8,6 @@
 
   #zc--img-container {
     border-radius: 1rem 1rem 0 0;
-
   }
 
   .zc--bg-blur {
@@ -36,8 +35,20 @@
 #add-product {
   transition: all 0.2s ease-in-out;
 
-  display: none;
+  display: block;
   position: absolute;
   bottom: 1rem;
   right: 1rem;
+
+  @media (width >= 48rem) {
+    display: block;
+  }
+
+  @media (width >= 64rem) {
+    display: none;
+  }
+
+  @media (width >= 80rem) {
+    display: none;
+  }
 }

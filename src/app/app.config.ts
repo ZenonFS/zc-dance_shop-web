@@ -1,7 +1,8 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
-  provideZoneChangeDetection, isDevMode,
+  provideZoneChangeDetection,
+  isDevMode,
 } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
@@ -11,6 +12,7 @@ import { providePrimeNG } from 'primeng/config';
 import Lara from '@primeuix/themes/lara';
 import { definePreset } from '@primeuix/themes';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 const ZC = definePreset(Lara, {
   semantic: {
@@ -32,12 +34,16 @@ const ZC = definePreset(Lara, {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withInMemoryScrolling({
+    provideRouter(
+      routes,
+      withInMemoryScrolling({
         anchorScrolling: 'enabled',
         scrollPositionRestoration: 'enabled',
-    })),
+      })
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       translation: {
@@ -54,12 +60,14 @@ export const appConfig: ApplicationConfig = {
           },
         },
       },
-    }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }),
+    }),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };
