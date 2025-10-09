@@ -1,0 +1,13 @@
+@for (section of sections; track $index) {
+ <p-divider align="center" type="dotted">
+  <b class="text-2xl md:text-4xl">{{ section.title }}</b>
+ </p-divider>
+<div class="flex flex-wrap items-center justify-center gap-12 lg:gap-18">
+  @for (item of section.items; track $index) {
+  <div class="zc--card">
+    <p-image [src]="item.imageUrl" [alt]="item.imageAlt" preview />
+    <p [innerHTML]="item.description" ></p>
+  </div>
+  }
+</div>
+}

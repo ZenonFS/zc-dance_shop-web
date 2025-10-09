@@ -1,0 +1,35 @@
+<h2 class="mt-8">¿Cómo escoger el color correctamente?</h2>
+<div class="flex md:flex-row flex-col">
+  <p-image
+    class="md:w-[50%]"
+    src="/tips/color-preference/row_1.PNG"
+    alt="tips/color-preference/row_1.png"
+    [preview]="true"
+  />
+  <div class="zc--tip md:w-[50%]">
+    <h4 class="w-fit text-2xl text-white p-4 bg-black rounded-xl">{{ tipsList[0]['title'] }}</h4>
+    @for (tip of tipsList[0]['tips']; track $index) {
+    <p class="text-2xl">{{ tip }}</p>
+    }
+  </div>
+</div>
+<div class="zc--tip">
+  <h4 class="w-fit text-2xl text-white p-4 bg-black md:ml-[30%] rounded-xl">{{ tipsList[1]['title'] }}</h4>
+  @for (tip of tipsList[1]['tips']; track $index) {
+  <p class="text-2xl text-center">{{ tip }}</p>
+  }
+</div>
+<div class="flex md:flex-row flex-col mb-8">
+  <div class="zc--tip md:w-[50%]">
+    <h4 class="w-fit text-2xl text-white p-4 bg-black rounded-xl">{{ tipsList[2]['title'] }}</h4>
+    @for (tip of tipsList[2]['tips']; track $index) {
+    <p class="text-2xl">{{ tip }}</p>
+    }
+  </div>
+  <p-image
+    class="md:w-[50%]"
+    src="/tips/color-preference/row_2.PNG"
+    alt="tips/color-preference/row_2.png"
+    [preview]="true"
+  />
+</div>

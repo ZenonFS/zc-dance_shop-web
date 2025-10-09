@@ -8,6 +8,7 @@ import { Auth } from './pages/auth/auth';
 import { Orders } from './pages/admin/orders/orders';
 import { Shipments } from './pages/admin/shipments/shipments';
 import { Faq } from './pages/home/faq/faq';
+import { FaqDetails } from './pages/home/faq-details/faq-details';
 
 export const routes: Routes = [
   {
@@ -17,6 +18,7 @@ export const routes: Routes = [
       { path: '', component: Landing },
       { path: 'collections', component: Collections,  },
       { path: 'faq', component: Faq,  },
+      { path: 'faq/:id', component: FaqDetails,  },
     ],
   },
   { path: 'auth', component: Auth },

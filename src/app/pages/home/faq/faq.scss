@@ -1,0 +1,56 @@
+$zc--margin-mobile: 2rem;
+$zc--margin: 8rem;
+
+.zc--even {
+  background-color: #000;
+  margin-right: $zc--margin-mobile;
+
+  @media (width >= 48rem) {
+    margin-right: $zc--margin;
+  }
+}
+
+.zc--odd {
+  background-color: var(--p-primary-color);
+  margin-left: $zc--margin-mobile;
+
+  @media (width >= 48rem) {
+    margin-left: $zc--margin;
+  }
+}
+
+.zc--tip {
+  border-radius: 1rem;
+
+  display: inline-block;
+  font-weight: 500;
+  text-decoration: underline 0.1em rgba(255, 255, 255, 0);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 300ms, text-underline-offset 300ms;
+  cursor: pointer;
+}
+
+.zc--tip:hover {
+  text-decoration-color: rgba(255, 255, 255);
+  text-underline-offset: 0.4em;
+}
+
+#content
+// :host
+ {
+  background-image: url('./../../../../../public/tips/presentation.PNG');
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  background-position: right 10rem;
+  background-attachment: fixed;
+
+  @media (width >= 48rem) {
+    background-position: right bottom;
+    background-attachment: scroll;
+  }
+
+  @media (width >= 64rem) {
+    background-size: scale(1.2);
+  }
+}

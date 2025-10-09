@@ -5,6 +5,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { CarouselModule, CarouselResponsiveOptions } from 'primeng/carousel';
 import { CategoryCard } from '@/app/components/landing/category-card/category-card';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
@@ -60,6 +61,8 @@ export class Landing implements OnInit {
     },
   ];
 
+  constructor(private readonly router: Router) {}
+
   ngOnInit() {
     this.responsiveOptions = [
       {
@@ -101,5 +104,9 @@ export class Landing implements OnInit {
 
   onMouseLeave(cardMpa: HTMLDivElement) {
     cardMpa.style.transform = 'rotateX(0) rotateY(0)';
+  }
+
+  goToTipDetails(id: string) {
+    this.router.navigate(['faq', id]);
   }
 }

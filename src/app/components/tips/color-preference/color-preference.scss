@@ -1,0 +1,29 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding: 0 2rem;
+
+  @media (width >= 48rem) {
+    padding: 0 3rem;
+  }
+
+  @media (width >= 64rem) {
+    padding: 0 15rem;
+  }
+
+  @media (width >= 80rem) {
+    padding: 0 20rem;
+  }
+}
+
+h2 {
+  text-align: center;
+  font-size: 2em;
+}
+
+.zc--tip {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+}

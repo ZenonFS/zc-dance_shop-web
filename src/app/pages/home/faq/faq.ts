@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { AccordionModule } from 'primeng/accordion';
 import { IFAQ } from '@/shared/interfaces/faq.interfaces';
 import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-faq',
@@ -16,7 +16,6 @@ import { ButtonModule } from 'primeng/button';
     InputGroupModule,
     InputGroupAddonModule,
     InputTextModule,
-    AccordionModule,
     ButtonModule,
   ],
   templateUrl: './faq.html',
@@ -27,22 +26,37 @@ export class Faq {
 
   faqs: IFAQ[] = [
     {
-      id: '1',
-      title: 'Header I',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      id: 'color-preference',
+      title: '¿Cómo escoger el color correctamente?',
+
     },
     {
-      id: '2',
-      title: 'Header II',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      id: 'tights-combination',
+      title: '¿Cómo combinar las medias para lograr el look ideal?',
+    },
+    {
+      id: 'tights-caution',
+      title: '¿Cómo cuidar correctamente las medias?',
+    },
+    {
+      id: 'heel-protectors',
+      title: '¿Para qué sirven los protectores del tacón?',
+    },
+      {
+      id: 'shoe-brush',
+      title: '¿Para qué sirve el cepillo de zapato?',
     },
   ];
 
   activeIndex: number = 0;
 
+  constructor(private readonly router: Router) {}
+
   activeIndexChange(index: number) {
     this.activeIndex = index;
+  }
+
+  goToDetails(faq: IFAQ) {
+    this.router.navigate(['faq', faq.id])
   }
 }
