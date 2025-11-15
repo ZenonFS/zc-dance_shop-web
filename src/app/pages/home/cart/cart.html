@@ -1,1 +1,99 @@
-<p>cart works!</p>
+<p-confirmpopup />
+<section class="w-full md:w-[50%] lg:w-[70%]">
+  <p-card>
+    <ng-template #title>
+      <!-- @if (products.length !== 0) {
+      <p-checkbox
+        name="all-products"
+        class="mr-4"
+        [(ngModel)]="isSelectAllProducts"
+        [binary]="true"
+        [indeterminate]="true"
+        (click)="selectAll()"
+      />
+      } -->
+      <span>Productos</span>
+      <p-divider />
+    </ng-template>
+    @if (products.length === 0) {
+    <div class="flex flex-col items-center justify-center h-64">
+      <span class="text-lg mb-4">Tu carrito está vacío</span>
+      <p-button label="Ir a la tienda" (onClick)="goToStore()" />
+    </div>
+    } @else { @for (product of products; track $index) {
+    <div class="flex flex-col lg:flex-row gap-4 mb-4">
+      <div class="flex gap-4 w-full">
+        <p-checkbox
+          [name]="product.name"
+          [id]="product.uuid"
+          [(ngModel)]="product.isSelected"
+          [binary]="true"
+        />
+        <img class="w-20" [src]="product.imagesUrl[0].url" [alt]="product.imagesUrl[0].name" />
+        <div class="flex flex-col justify-between w-full">
+          <p class="text-lg font-bold">{{ product.name }}</p>
+          <p-button
+            label="Eliminar"
+            variant="text"
+            severity="danger"
+            (onClick)="confirm($event, product)"
+          />
+        </div>
+      </div>
+      <div class="flex gap-4 ml-10 lg:ml-0 justify-between lg:justify-start">
+        <p-inputNumber
+          class="h-8"
+          [(ngModel)]="product.amount"
+          [min]="1"
+          [max]="product.quantityAvalible"
+          [inputStyle]="{ width: '3rem' }"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+        >
+          <ng-template #incrementbuttonicon>
+            <span class="pi pi-plus"></span>
+          </ng-template>
+          <ng-template #decrementbuttonicon>
+            <span class="pi pi-minus"></span>
+          </ng-template>
+        </p-inputNumber>
+        <div class="flex flex-col gap-4">
+          <span class="text-md font-bold">{{ product.price * product.amount | currency }}</span>
+          <span class="text-sm">{{ product.price | currency }} c/u</span>
+        </div>
+      </div>
+    </div>
+
+    }}
+  </p-card>
+  <router-outlet></router-outlet>
+</section>
+<p-card role="region" class="w-full md:w-[40%] lg:w-[20%] h-min sticky top-25">
+  <ng-template #title>
+    <span>Resumen</span>
+    <p-divider />
+  </ng-template>
+
+  <div class="flex flex-row justify-between items-start gap-2">
+    <span class="text-md"
+      >Productos {{ cartTotalProducts === 0 ? '' : '(' + cartTotalProducts + ')' }}</span
+    >
+    <span class="text-md">{{ cartTotalPrice | currency }}</span>
+  </div>
+  <div class="flex flex-row justify-between items-start gap-2">
+    <span class="text-md">Envío</span>
+    <span class="text-md">{{ shippingCostToString }}</span>
+  </div>
+  <div class="flex flex-row justify-between items-start gap-2">
+    <b class="text-lg">Total</b>
+    <b class="text-lg">{{ cartTotal | currency }}</b>
+  </div>
+  <ng-template #footer>
+    <p-button
+      [label]="canFinalize ? 'Finalizar compra' : 'Continuar compra'"
+      styleClass="w-full"
+      (onClick)="continue()"
+      [loading]="isLoading"
+    />
+  </ng-template>
+</p-card>

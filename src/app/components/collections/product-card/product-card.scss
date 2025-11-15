@@ -10,7 +10,8 @@
     border-radius: 1rem 1rem 0 0;
   }
 
-  .zc--bg-blur {
+  .zc--bg, .zc--bg-blur {
+    position: absolute;
     top: 0;
     left: 0;
     height: 100%;
@@ -29,6 +30,32 @@
 
       display: block;
     }
+  }
+}
+
+::ng-deep {
+  .p-carousel-content {
+    position: relative;
+  }
+
+  .p-carousel-next-button,
+  .p-carousel-prev-button {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+  }
+
+  .p-carousel-prev-button {
+    left: 0;
+  }
+
+  .p-carousel-next-button {
+    right: 0;
+  }
+
+  .p-carousel-indicator-button {
+    border-radius: 5px;
+    height: 10px;
   }
 }
 

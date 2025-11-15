@@ -13,6 +13,7 @@ import { Cart } from '../../../domain/use-cases/cart';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { ProductCart } from '../../components/collections/product-cart/product-cart';
 import { TooltipModule } from 'primeng/tooltip';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 @Component({
   selector: 'app-home',
@@ -27,6 +28,7 @@ import { TooltipModule } from 'primeng/tooltip';
     ButtonModule,
     DrawerModule,
     ScrollTopModule,
+    OverlayBadgeModule,
     ProductCart,
     TooltipModule,
     RouterLink,
@@ -37,6 +39,10 @@ import { TooltipModule } from 'primeng/tooltip';
 export class Home {
   items: MenuItem[] | undefined;
   visible: boolean = false;
+
+  get filteredProducts() {
+    return this.cart.products.filter(({isSelected}) => isSelected)
+  }
 
   constructor(
     public readonly cart: Cart,
@@ -117,5 +123,10 @@ export class Home {
   openWhatsapp() {
     const encodedMessage = encodeURIComponent(this.whatsappMessage);
     window.open(`https://wa.me/${this.whatsappPhone}?text=${encodedMessage}`, '_blank');
+  }
+
+  goToCartPage() {
+    this.visible = false;
+    this.router.navigate(['cart']);
   }
 }

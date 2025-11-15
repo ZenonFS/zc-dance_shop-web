@@ -1,20 +1,49 @@
-<div class="flex flex-col items-center rounded-xl bg-[#f1f1f1] p-2 gap-2 mb-2 justify-between">
-  @if (product.imageUrl) {
-  <div class="flex items-center gap-2">
-    <p-image
-      [src]="product.imageUrl"
+<p-toast />
+<p-confirmdialog />
+<div class="flex items-center rounded-xl bg-[#f1f1f1] p-2 gap-2 mb-2 justify-between">
+  @if (product.imagesUrl) {
+  <div class="flex items-center gap-2 w-20">
+    <img
+      [src]="product.imagesUrl[0].url"
       alt="Alt"
       appendTo="body"
-      height="1rem"
+      [height]="120"
       class="block w-full object-cover"
-      />
-    <span class="font-bold">{{ product.name }}</span>
+    />
   </div>
-  <div class="flex gap-4">
-    <span>{{ product.price | currency }}</span>
-    <span>{{ product.amount }} productos</span>
+  <div class="flex flex-col gap-4 w-full">
+    <span class="text-lg font-bold">{{ product.name }}</span>
+    <div class="flex flex-col gap-4">
+      <span class="font-bold">{{ product.price * product.amount | currency }}</span>
+      <span class="text-sm">{{ product.price | currency }} c/u</span>
+    </div>
+    <p-inputNumber
+      class="h-8"
+      [(ngModel)]="product.amount"
+      [min]="1"
+      [max]="product.quantityAvalible"
+      [inputStyle]="{ width: '3rem' }"
+      [showButtons]="true"
+      buttonLayout="horizontal"
+    >
+      <ng-template #incrementbuttonicon>
+        <span class="pi pi-plus"></span>
+      </ng-template>
+      <ng-template #decrementbuttonicon>
+        <span class="pi pi-minus"></span>
+      </ng-template>
+    </p-inputNumber>
   </div>
   } @else {
   <p-skeleton height="20rem" />
   }
+  <div>
+    <p-button
+      icon="pi pi-times"
+      [rounded]="true"
+      [text]="true"
+      severity="danger"
+      (click)="confirm2($event)"
+    />
+  </div>
 </div>

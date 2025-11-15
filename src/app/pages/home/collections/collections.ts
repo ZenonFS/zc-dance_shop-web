@@ -39,7 +39,7 @@ export class Collections {
       name: '',
       price: 0,
       description: '',
-      imageUrl: '',
+      imagesUrl: [],
       quantityAvalible: 0,
     },
     {
@@ -47,7 +47,7 @@ export class Collections {
       name: '',
       price: 0,
       description: '',
-      imageUrl: '',
+      imagesUrl: [],
       quantityAvalible: 0,
     },
     {
@@ -55,10 +55,9 @@ export class Collections {
       name: '',
       price: 0,
       description: '',
-      imageUrl: '',
+      imagesUrl: [],
       quantityAvalible: 0,
     },
-
   ];
 
   get products() {
@@ -142,13 +141,14 @@ export class Collections {
         name: product['name'],
         price: product['price'][0]['price'],
         description: product['description'],
-        imageUrl: product['images']?.[0]['url'] ?? '/zc.png',
+        imagesUrl: product['images'] ?? ['/zc.png'],
         quantityAvalible: product['inventory']['availableQuantity'],
       }));
     return results;
   }
 
   private async _loadMoreProducts() {
+    if (this.products.length < 25) this.page = -1;
     if (this.page === -1) return;
     this.loadingMore = true;
 
@@ -165,7 +165,7 @@ export class Collections {
         name: product['name'],
         price: product['price'][0]['price'],
         description: product['description'],
-        imageUrl: product['images']?.[0]['url'] ?? '/zc.png',
+        imagesUrl: product['images'] ?? ['/zc.png'],
         quantityAvalible: product['inventory']['availableQuantity'],
       }));
 

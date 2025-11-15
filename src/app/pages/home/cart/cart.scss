@@ -1,0 +1,22 @@
+:host {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media (width >= 48rem) {
+    flex-direction: row;
+  }
+
+  @media (width >= 64rem) {
+    padding: 2rem 5rem;
+  }
+
+  @media (width >= 80rem) {
+    padding: 2rem 10rem;
+  }
+}
+
+b {
+  font-family: 'Advent Pro', sans-serif;
+}

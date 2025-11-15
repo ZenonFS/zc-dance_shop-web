@@ -1,8 +1,7 @@
 <div class="flex flex-col px-6 md:px-16 py-8 gap-6">
   <div class="flex flex-wrap bg-[#F1F1F1] rounded-xl p-6 md:p-8 gap-2">
-    <form class="flex flex-wrap gap-2 w-full overflow-auto">
+    <form class="flex flex-wrap gap-2 w-full sm:overflow-auto md:overflow-hidden">
       @for (filter of filters; track $index) { @if (filter['type'] === 'select') {
-      <!-- [optionValue]="selectedType" -->
       <p-select
         [options]="filter['options']"
         (onChange)="onChangeFilter($event, '')"
@@ -12,7 +11,6 @@
         class="w-full md:w-max h-fit"
       />
       } @else if (filter['type'] === 'selectbutton') {
-      <!-- [optionValue]="selectedColor" -->
       <p-selectbutton
         [options]="filter['options']"
         [multiple]="true"
@@ -33,10 +31,11 @@
   <div class="px-2 flex justify-center gap-8 flex-wrap">
     @for (product of products; track $index) {
     <app-product-card
+      [uuid]="product.uuid"
       [name]="product.name"
       [description]="product.description"
       [price]="product.price"
-      [imageUrl]="product.imageUrl"
+      [imagesUrl]="product.imagesUrl"
     ></app-product-card>
     } @if(loadingMore) {
     <app-product-card></app-product-card>

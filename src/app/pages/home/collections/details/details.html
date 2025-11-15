@@ -1,1 +1,118 @@
-<p>details works!</p>
+<p-toast />
+<p-breadcrumb [home]="home" [model]="breadcumItems" />
+
+<div id="content" class="flex flex-col md:flex-row gap-6">
+  <div class="lg:w-[50%]">
+    <p-carousel
+      [value]="images"
+      [numVisible]="2"
+      [numScroll]="1"
+      [circular]="true"
+      [responsiveOptions]="responsiveOptions"
+      class="h-full"
+    >
+      <ng-template let-image #item>
+        <div class="relative h-[60vh] flex items-center justify-center">
+          <img
+            [src]="image.url ?? '/zc.png'"
+            alt="ZC Imágen de Producto"
+            class="relative object-cover z-110"
+          />
+          <img
+            [src]="image.url ?? '/zc.png'"
+            alt="ZC Imágen de Producto de fondo"
+            class="zc--bg-blur absolute object-cover w-full h-full blur-md z-100"
+          />
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+  <div class="details flex flex-col gap-4 lg:w-[50%]">
+    <div id="general">
+      @if (product) {
+      <h3 class="text-2xl">{{ product.name }}</h3>
+      <span class="text-sm">{{ product.reference }}</span>
+      <h4 class="mt-2">{{ product.price[0].price | currency }}</h4>
+      } @else {
+      <p-skeleton class="mb-4"></p-skeleton>
+      <p-skeleton class="mb-4"></p-skeleton>
+      <p-skeleton class="mb-4"></p-skeleton>
+      }
+    </div>
+    <p-accordion value="2" [multiple]="true">
+      <p-accordion-panel value="0">
+        <p-accordion-header><span class="text-xl">Colores</span></p-accordion-header>
+        <p-accordion-content>
+          <div id="colors">
+            @if (colors.length === 0) {
+            <p-skeleton class="p-5" width="50%"></p-skeleton>
+
+            } @else {
+            <p-selectbutton
+              [options]="colors"
+              [multiple]="true"
+              optionLabel="value"
+              (onChange)="onColorChange($event)"
+              optionValue="value"
+              optionDisabled="isDisabled"
+            />
+            }
+          </div>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <p-accordion-panel value="1">
+        <p-accordion-header><span class="text-xl">Tallas</span></p-accordion-header>
+        <p-accordion-content>
+          <div id="sizes">
+            @if (sizes.length === 0) {
+            <p-skeleton class="p-5" width="50%"></p-skeleton>
+
+            } @else {
+            <p-selectbutton
+              [options]="sizes"
+              [multiple]="true"
+              (onChange)="onSizeChange($event)"
+              optionLabel="value"
+              optionValue="value"
+              optionDisabled="isDisabled"
+            />
+            }
+          </div>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <p-accordion-panel value="2">
+        <p-accordion-header><span class="text-xl">Descripción</span></p-accordion-header>
+        <p-accordion-content>
+          <div id="description">
+            @if (product) {
+            <p>{{ product.description }}</p>
+            } @else {
+            <p-skeleton></p-skeleton>
+            }
+          </div>
+        </p-accordion-content>
+      </p-accordion-panel>
+    </p-accordion>
+
+    <div id="footer" class="flex flex-col gap-4">
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <p-button icon="pi pi-minus" severity="secondary" />
+        </p-inputgroup-addon>
+        <input pInputText class="w-20 px-2" placeholder="Cantidad" [value]="1" />
+        <p-inputgroup-addon>
+          <p-button icon="pi pi-plus" severity="secondary" />
+        </p-inputgroup-addon>
+      </p-inputgroup>
+      <p-button
+        icon="pi pi-shopping-bag"
+        [label]="productIsInCart ?  'Producto en la bolsa' : 'Añadir a mi bolsa'"
+        class="w-full"
+        (click)="addProductToCart()"
+        (keydown)="addProductToCart()"
+      />
+    </div>
+  </div>
+</div>

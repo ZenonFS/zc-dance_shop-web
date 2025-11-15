@@ -1,12 +1,30 @@
+<p-toast />
 <div
   id="zc--img-container"
   class="relative h-[20rem] flex items-center justify-center justify-content-center overflow-hidden"
 >
-  @if (imageUrl) {
-  <ng-container>
-    <img [src]="imageUrl" alt="zc--bg" class="block w-full object-cover z-100" />
-    <img [src]="imageUrl" alt="zc--bg-blur" class="zc--bg-blur absolute object-cover blur-md" />
-  </ng-container>
+  @if (imagesUrl) {
+  <p-carousel
+    [value]="imagesUrl"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="false"
+    [showIndicators]="false"
+    [showNavigators]="showNavigators"
+    [responsiveOptions]="responsiveOptions"
+    class="h-full"
+  >
+    <ng-template let-image #item>
+      <div class="relative h-[20rem] flex items-center justify-center" (click)="goToDetails()" (keydown)="goToDetails()">
+        <img [src]="image.url ?? '/zc.png'" alt="ZC Imágen de Producto" class="relative object-cover z-110" />
+        <img
+            [src]="image.url ?? '/zc.png'"
+            alt="ZC Imágen de Producto de fondo"
+            class="zc--bg-blur absolute object-cover w-full blur-md z-100"
+          />
+      </div>
+    </ng-template>
+  </p-carousel>
   } @else {
   <p-skeleton height="20rem" />
   }
@@ -19,7 +37,7 @@
     (onClick)="addProductToCart()"
   ></p-button>
 </div>
-<div id="details" class="flex flex-col p-6 gap-2">
+<div id="details" class="flex flex-col p-6 gap-2" (click)="goToDetails()" (keydown)="goToDetails()">
   @if (name) {
   <span class="font-bold text-xl">{{ name }}</span>
   } @else {

@@ -1,5 +1,7 @@
 <div class="flex p-1 w-full bg-black items-center justify-center">
-  <span class="text-white text-center font-bold">Envíos GRATIS por compras superiores a $400.000</span>
+  <span class="text-white text-center font-bold"
+    >Envíos GRATIS por compras superiores a $400.000</span
+  >
 </div>
 <p-menubar [model]="items">
   <ng-template #start>
@@ -48,14 +50,16 @@
         variant="text"
         (onClick)="navigateToAuth()"
       /> -->
-      <p-button
-        icon="pi pi-shopping-bag"
-        id="shopping-bag-btn"
-        title="shopping bag"
-        variant="text"
-        (click)="visible = true"
-        (keydown)="visible = true"
-      />
+      <p-overlaybadge [value]="cart.cartTotalProducts" severity="info" size="small">
+        <p-button
+          icon="pi pi-shopping-bag"
+          id="shopping-bag-btn"
+          title="shopping bag"
+          variant="text"
+          (click)="visible = true"
+          (keydown)="visible = true"
+        />
+      </p-overlaybadge>
     </div>
   </ng-template>
 </p-menubar>
@@ -75,12 +79,12 @@
   <div class="flex items-center rounded-xl bg-[#f1f1f1] p-2 gap-2 mb-2 justify-between">
     <div class="flex items-center gap-2">
       <i class="pi pi-box"></i>
-      <span>{{ cart.cartTotalProducts }} productos</span>
+      <span>{{ cart.cartTotalProducts }} productos <i class="text-sm">({{ cart.cartTotalUnits }} unidades)</i></span>
     </div>
     <span>{{ cart.cartTotalPrice | currency }}</span>
   </div>
 
-  @for (product of cart.products; track $index) {
+  @for (product of filteredProducts; track $index) {
   <app-product-cart [product]="product"></app-product-cart>
   }
 
@@ -93,6 +97,7 @@
         icon="pi pi-shopping-bag"
         class="w-full"
         outlined
+        (click)="goToCartPage()"
       ></button>
     </div>
   </ng-template>
@@ -111,7 +116,6 @@
   pTooltip="WhatsApp"
   tooltipPosition="left"
 />
-<p-scrolltop [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }" />
 <footer class="flex flex-col w-full justify-between inset-shadow-sm inset-shadow-cyan-500/50">
   <div class="flex flex-wrap gap-8 justify-center items-center p-8">
     <div
@@ -137,3 +141,5 @@
     <span class="text-sm">Desarrollado por Zenon con ❤️</span>
   </div>
 </footer>
+
+<p-scrolltop [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }" />
