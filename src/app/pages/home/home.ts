@@ -60,42 +60,42 @@ export class Home {
         label: 'Inicio',
         url: '/',
       },
-      {
-        id: 'collections',
-        title: 'Categorías',
-        label: 'Categorías',
-        items: [
-          {
-            id: 'todas',
-            label: 'Todas',
-            url: '/collections',
-          },
-          {
-            id: 'medias-profesionales-adulto',
-            label: 'Medias profesionales - Adulto',
-            url: '/collections',
-            queryParams: {
-              t: 'medias-profesionales-adulto',
-            },
-          },
-          {
-            id: 'medias-profesionales-junior',
-            label: 'Medias profesionales - Infantil',
-            url: '/collections',
-            queryParams: {
-              t: 'medias-profesionales-infantil',
-            },
-          },
-          {
-            id: 'accesorios',
-            label: 'Accesorios',
-            url: '/collections',
-            queryParams: {
-              t: 'accesorios',
-            },
-          },
-        ],
-      },
+      // {
+      //   id: 'collections',
+      //   title: 'Categorías',
+      //   label: 'Categorías',
+      //   items: [
+      //     {
+      //       id: 'todas',
+      //       label: 'Todas',
+      //       url: '/collections',
+      //     },
+      //     {
+      //       id: 'medias-profesionales-adulto',
+      //       label: 'Medias profesionales - Adulto',
+      //       url: '/collections',
+      //       queryParams: {
+      //         t: 'medias-profesionales-adulto',
+      //       },
+      //     },
+      //     {
+      //       id: 'medias-profesionales-junior',
+      //       label: 'Medias profesionales - Infantil',
+      //       url: '/collections',
+      //       queryParams: {
+      //         t: 'medias-profesionales-infantil',
+      //       },
+      //     },
+      //     {
+      //       id: 'accesorios',
+      //       label: 'Accesorios',
+      //       url: '/collections',
+      //       queryParams: {
+      //         t: 'accesorios',
+      //       },
+      //     },
+      //   ],
+      // },
       {
         id: 'tips',
         title: 'Preguntas frecuentes',
