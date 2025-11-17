@@ -49,17 +49,17 @@ export class TightsCombination {
       title: 'Tono de piel medio',
       items: [
         {
-          imageUrl: '/tips/tights-combination/skin-tone-medium-2.1.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-medium-2.1.png',
           imageAlt: 'skin-tone-medium-2.1',
           description: 'Medias veladas efecto Beyoncé color canela',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-medium-2.2.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-medium-2.2.png',
           imageAlt: 'skin-tone-medium-2.2',
           description: 'Medias malla profesionales color canela',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-medium-2.3.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-medium-2.3.png',
           imageAlt: 'skin-tone-medium-2.3',
           description:
             'Medias veladas efecto Beyoncé color canela + Medias malla profesionales color canela',
@@ -70,17 +70,17 @@ export class TightsCombination {
       title: 'Tono de piel oscuro',
       items: [
          {
-          imageUrl: '/tips/tights-combination/skin-tone-dark-3.1.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-dark-3.1.png',
           imageAlt: 'skin-tone-dark-3.1',
           description: 'Medias veladas efecto Beyoncé color canela',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-dark-3.2.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-dark-3.2.png',
           imageAlt: 'skin-tone-dark-3.2',
           description: 'Medias malla profesionales color canela',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-dark-3.3.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-dark-3.3.png',
           imageAlt: 'skin-tone-dark-3.3',
           description:
             'Medias veladas efecto Beyoncé color canela + Medias malla profesionales color canela',
