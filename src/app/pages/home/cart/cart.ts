@@ -15,6 +15,8 @@ import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
 import { DateTime } from 'luxon';
 import { environment } from '@/environments/environment';
 import { CreateContactDTO, UpdateContactDTO } from '@/shared/interfaces/clients.interfaces';
+import { Popover } from 'primeng/popover';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-cart',
@@ -30,6 +32,8 @@ import { CreateContactDTO, UpdateContactDTO } from '@/shared/interfaces/clients.
     InputNumber,
     CurrencyPipe,
     RouterOutlet,
+    Popover,
+    Tooltip,
   ],
   providers: [ConfirmationService, CurrencyPipe],
   templateUrl: './cart.html',
@@ -270,7 +274,7 @@ export class Cart implements OnInit {
       console.log('this.#cartInstance.shippingDataIsValid', this.#cartInstance.shippingDataIsValid);
 
       if (this.#cartInstance.facturationDataIsValid && this.#cartInstance.clientId)
-        if (!this.#cartInstance.transactionId )
+        if (!this.#cartInstance.transactionId)
           try {
             this.isLoading = true;
             const { results } = await this.#ecommerceInstance.postCreateTransaction({
@@ -298,34 +302,34 @@ export class Cart implements OnInit {
           } finally {
             this.isLoading = false;
           }
-        // else (this.#cartInstance.transactionId)
-        // try {
-        //     this.isLoading = true;
-        //     const { results } = await this.#ecommerceInstance.postCreateTransaction({
-        //       products: this.filteredProducts,
-        //       reference: this.transactionReference,
-        //       facturationData: {
-        //         ...this.#cartInstance.facturationData,
-        //         id: this.#cartInstance.clientId,
-        //       },
-        //       shippingData: this.#cartInstance.shippingData,
-        //     });
+      // else (this.#cartInstance.transactionId)
+      // try {
+      //     this.isLoading = true;
+      //     const { results } = await this.#ecommerceInstance.postCreateTransaction({
+      //       products: this.filteredProducts,
+      //       reference: this.transactionReference,
+      //       facturationData: {
+      //         ...this.#cartInstance.facturationData,
+      //         id: this.#cartInstance.clientId,
+      //       },
+      //       shippingData: this.#cartInstance.shippingData,
+      //     });
 
-        //     if (!results) throw new Error('Results is void');
+      //     if (!results) throw new Error('Results is void');
 
-        //     this.#cartInstance.transactionId = results['_id'];
-        //     this.#router.navigate([], {
-        //       queryParams: {
-        //         transactionReference: this.transactionReference,
-        //         transactionId: this.#cartInstance.transactionId,
-        //       },
-        //       relativeTo: this.#route,
-        //     });
-        //   } catch (error) {
-        //     console.error('[continue] postCreateTransaction - error', error);
-        //   } finally {
-        //     this.isLoading = false;
-        //   }
+      //     this.#cartInstance.transactionId = results['_id'];
+      //     this.#router.navigate([], {
+      //       queryParams: {
+      //         transactionReference: this.transactionReference,
+      //         transactionId: this.#cartInstance.transactionId,
+      //       },
+      //       relativeTo: this.#route,
+      //     });
+      //   } catch (error) {
+      //     console.error('[continue] postCreateTransaction - error', error);
+      //   } finally {
+      //     this.isLoading = false;
+      //   }
     }
   }
 

@@ -81,7 +81,15 @@
     <span class="text-md">{{ cartTotalPrice | currency }}</span>
   </div>
   <div class="flex flex-row justify-between items-start gap-2">
-    <span class="text-md">Envío</span>
+    <span class="text-md"
+      >Envío
+      <i
+        class="pi pi-question-circle"
+        style="font-size: 0.8rem"
+        (click)="op.toggle($event)"
+        pTooltip="Click para más detalles"
+      ></i
+    ></span>
     <span class="text-md">{{ shippingCostToString }}</span>
   </div>
   <div class="flex flex-row justify-between items-start gap-2">
@@ -97,3 +105,15 @@
     />
   </ng-template>
 </p-card>
+
+<p-popover #op>
+  <div class="flex flex-col gap-4 w-full md:w-[25rem]">
+    <span class="font-bold text-lg">Tarifas de Envío</span>
+    <p-divider class="my-1"></p-divider>
+    <p>Por compras <i>superiores a $400.000</i> el envío es <b>GRATIS</b>.</p>
+    <ol class="p-0 m-0 flex flex-col gap-2">
+      <li><b>$12.000</b> - Medellín, Bello, Itagüi, Sabaneta y La Estrella</li>
+      <li><b>$18.000</b> - Otros municipios, con envío a todo el país.</li>
+    </ol>
+  </div>
+</p-popover>
