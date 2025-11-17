@@ -22,17 +22,17 @@ export class TightsCombination {
           description: 'Medias veladas efecto Beyoncé color claro',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-light-1.2.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-light-1.2.png',
           imageAlt: 'skin-tone-light-1.2',
           description: 'Medias malla profesionales color claro',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-light-1.3.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-light-1.3.png',
           imageAlt: 'skin-tone-light-1.3',
           description: 'Medias malla profesionales color canela',
         },
         {
-          imageUrl: '/tips/tights-combination/skin-tone-light-1.4.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-light-1.4.png',
           imageAlt: 'skin-tone-light-1.4',
           description:
             'Medias veladas efecto Beyoncé color claro<br/>+<br/>Medias malla profesionales color canela',
