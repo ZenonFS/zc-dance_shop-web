@@ -1,7 +1,7 @@
 {
   "name": "zc-dance-shop-web",
   "description": "ZC Dance Shop: venta de medias profesionales, accesorios de baile y ropa especializada para bailarines. Encuentra calidad y estilo en cada producto.",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration development",
