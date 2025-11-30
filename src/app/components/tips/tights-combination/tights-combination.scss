@@ -13,13 +13,9 @@
   border-block-start: 4px solid var(--p-text-color);
 }
 
-b {
-  font-family: 'Advent Pro', sans-serif;
-}
-
 .zc--card {
   min-width: 300px;
-  max-width: 300px;
+  max-width: 600px;
   min-height: 450px;
 
   display: flex;
@@ -31,6 +27,7 @@ b {
   img {
     border-radius: 0.5rem;
     height: 450px;
+    width: fit-content;
   }
   p {
     text-align: center;

@@ -39,7 +39,7 @@ export class Landing implements OnInit {
     leaveClass: string;
   }[] = [
     {
-      imageSrc: '/landing/category-senior.jpg',
+      imageSrc: '/landing/category-senior.png',
       title: 'Medias profesionales - Adulto',
       url: '/collections?t=medias-profesionales-adulto',
       enterClass: 'animate-enter fade-in-10 zoom-in-50 animate-duration-1000',

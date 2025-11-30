@@ -17,7 +17,7 @@ export class TightsCombination {
       title: 'Tono de piel claro',
       items: [
         {
-          imageUrl: '/tips/tights-combination/skin-tone-light-1.1.PNG',
+          imageUrl: '/tips/tights-combination/skin-tone-light-1.1.png',
           imageAlt: 'skin-tone-light-1.1',
           description: 'Medias veladas efecto Beyoncé color claro',
         },
@@ -41,7 +41,7 @@ export class TightsCombination {
           imageUrl: '/tips/tights-combination/skin-tone-light-1.5.PNG',
           imageAlt: 'skin-tone-light-1.5',
           description:
-            'Medias veladas efecto Beyoncé color claro + Medias malla profesionales color claro',
+            'Medias veladas efecto Beyoncé color claro<br/>+<br/>Medias malla profesionales color claro',
         },
       ],
     },
@@ -83,7 +83,7 @@ export class TightsCombination {
           imageUrl: '/tips/tights-combination/skin-tone-dark-3.3.png',
           imageAlt: 'skin-tone-dark-3.3',
           description:
-            'Medias veladas efecto Beyoncé color canela + Medias malla profesionales color canela',
+            'Medias veladas efecto Beyoncé color canela<br/>+<br/>Medias malla profesionales color canela',
         },
       ],
     },
