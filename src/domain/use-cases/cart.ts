@@ -5,7 +5,7 @@ import IProductCart, {
 } from '../../shared/interfaces/cart.interfaces';
 import { liveQuery } from 'dexie';
 import { db } from '@/shared/config/indexdb.config';
-import { BehaviorSubject } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +22,7 @@ export class Cart {
     this.#isNewClient = value;
   }
 
-   #clientId: string | null = null;
+  #clientId: string | null = null;
   get clientId() {
     return this.#clientId;
   }
@@ -31,13 +31,12 @@ export class Cart {
   }
 
   private readonly cart: { products: IProductCart[] } = { products: [] };
+
   readonly #defaultValueShippingCost = 12000;
   #shippingCost = this.#defaultValueShippingCost;
-
   get shippingCost() {
     return this.#shippingCost === 0 || this.cartTotalPrice > 4000000 ? 0 : this.#shippingCost;
   }
-
   set shippingCost(value: number) {
     this.#shippingCost = value;
   }
@@ -70,7 +69,20 @@ export class Cart {
     return this.cart.products;
   }
 
+  fcUseFacturactionAdressData = new FormControl(false, [Validators.required]);
+  fcShippingState = new FormControl('', [Validators.required]);
+  fcShippingCity = new FormControl('', [Validators.required]);
+
+  fgShipping = new FormGroup({
+    useFacturactionAdressData: this.fcUseFacturactionAdressData,
+    address: new FormControl('', [Validators.required]),
+    city: this.fcShippingCity,
+    state: this.fcShippingState,
+    phoneNumber: new FormControl('', [Validators.required]),
+  });
+
   #shippingData: IShippingData = {
+    cost: 12000,
     address: null,
     state: null,
     city: null,
@@ -80,6 +92,9 @@ export class Cart {
     return this.#shippingData;
   }
   set shippingData(shippingData: IShippingData) {
+    const { cost, ...rest } = shippingData;
+    this.fgShipping.patchValue(rest, { emitEvent: false });
+
     this.#shippingData = shippingData;
   }
   #shippingDataIsValid = false;
@@ -89,6 +104,34 @@ export class Cart {
   set shippingDataIsValid(isValid) {
     this.#shippingDataIsValid = isValid;
   }
+
+  fcKindOfPerson = new FormControl<'PERSON_ENTITY' | 'LEGAL_ENTITY'>('PERSON_ENTITY', [
+    Validators.required,
+  ]);
+  fcNationalId = new FormControl('', [Validators.required]);
+  fcFullName = new FormControl('', [Validators.required]);
+  fcFirstName = new FormControl('', [Validators.required]);
+  fcSecondName = new FormControl('');
+  fcLastName = new FormControl('', [Validators.required]);
+  fcAddress = new FormControl('');
+  fcState = new FormControl('');
+  fcCity = new FormControl('');
+  fcPhoneNumber = new FormControl('', [Validators.required]);
+  fcEmail = new FormControl('', [Validators.required]);
+
+  fgFacturation = new FormGroup({
+    kindOfPerson: this.fcKindOfPerson,
+    nationalId: this.fcNationalId,
+    fullName: this.fcFullName,
+    firstName: this.fcFirstName,
+    secondName: this.fcSecondName,
+    lastName: this.fcLastName,
+    address: this.fcAddress,
+    state: this.fcState,
+    city: this.fcCity,
+    phoneNumber: this.fcPhoneNumber,
+    email: this.fcEmail,
+  });
 
   #facturationData: IFacturationData = {
     nationalId: null,
@@ -103,6 +146,7 @@ export class Cart {
     return this.#facturationData;
   }
   set facturationData(facturationData: IFacturationData) {
+    this.fgFacturation.patchValue(facturationData, { emitEvent: false });
     db.facturationData.upsert(<string>facturationData['nationalId'], facturationData);
     this.#facturationData = facturationData;
   }
@@ -119,10 +163,10 @@ export class Cart {
 
   #transactionId: string | null = null;
   get transactionId() {
-    return this.#transactionId
+    return this.#transactionId;
   }
   set transactionId(value) {
-    this.#transactionId = value
+    this.#transactionId = value;
   }
 
   constructor() {
@@ -141,7 +185,6 @@ export class Cart {
   async addProduct(productCart: IProductCart) {
     if (this.hasProduct(productCart.uuid)) await this.patchProduct(productCart.uuid, productCart);
     else {
-      debugger;
       await db.cart.add(productCart);
       this.cart.products.push(productCart);
     }
@@ -178,6 +221,6 @@ export class Cart {
   }
 
   async deleteProducts(uuids: string[]) {
-    uuids.forEach(this.deleteProduct)
+    await Promise.all(uuids.map((uuid) => this.deleteProduct(uuid)));
   }
 }

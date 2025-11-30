@@ -2,16 +2,6 @@
 <section class="w-full md:w-[50%] lg:w-[70%]">
   <p-card>
     <ng-template #title>
-      <!-- @if (products.length !== 0) {
-      <p-checkbox
-        name="all-products"
-        class="mr-4"
-        [(ngModel)]="isSelectAllProducts"
-        [binary]="true"
-        [indeterminate]="true"
-        (click)="selectAll()"
-      />
-      } -->
       <span>Productos</span>
       <p-divider />
     </ng-template>
@@ -29,9 +19,17 @@
           [(ngModel)]="product.isSelected"
           [binary]="true"
         />
-        <img class="w-20" [src]="product.imagesUrl[0].url" [alt]="product.imagesUrl[0].name" />
+        <a class="w-20 rounded-lg" [routerLink]="'/collections/details/' + product.uuid">
+          <img
+            class="w-20 rounded-lg"
+            [src]="product.imagesUrl[0].url"
+            [alt]="product.imagesUrl[0].name"
+          />
+        </a>
         <div class="flex flex-col justify-between w-full">
-          <p class="text-lg font-bold">{{ product.name }}</p>
+          <a class="text-lg font-bold" [routerLink]="'/collections/details/' + product.uuid">{{
+            product.name
+          }}</a>
           <p-button
             label="Eliminar"
             variant="text"

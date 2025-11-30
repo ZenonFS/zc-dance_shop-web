@@ -1,8 +1,8 @@
-<!-- <div class="flex p-1 w-full bg-black items-center justify-center">
+<div class="flex p-1 w-full bg-black items-center justify-center">
   <span class="text-white text-center font-bold"
     >Envíos GRATIS por compras superiores a $400.000</span
   >
-</div> -->
+</div>
 <p-menubar [model]="items">
   <ng-template #start>
     <div
@@ -50,7 +50,7 @@
         variant="text"
         (onClick)="navigateToAuth()"
       /> -->
-      <p-overlaybadge [value]="cart.cartTotalProducts" severity="info" size="small">
+      <p-overlaybadge [value]="cart.cartTotalProducts" severity="info" size="small" [badgeDisabled]="cart.cartTotalProducts === 0" badgeSize="small">
         <p-button
           icon="pi pi-shopping-bag"
           id="shopping-bag-btn"

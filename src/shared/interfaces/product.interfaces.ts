@@ -3,6 +3,8 @@ import { IImage } from "./product-details.interfaces";
 export interface IProduct {
   uuid: string;
   name: string;
+  reference: string;
+  type: string;
   price: number;
   description: string;
   imagesUrl: IImage[];

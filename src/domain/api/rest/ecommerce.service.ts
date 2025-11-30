@@ -1,4 +1,5 @@
 import { environment } from '@/environments/environment';
+import { IShippingData } from '@/shared/interfaces/cart.interfaces';
 import {
   CreateContactDTO,
   IClient,
@@ -56,10 +57,35 @@ export class EcommerceService {
     );
   }
 
+  async getTransaction(id: string) {
+    return await firstValueFrom(
+      this.httpClient.get<
+        IHttpResponse<{
+          _id: string;
+          reference: string;
+          products: Record<string, any>[];
+          facturationData: Record<string, any>;
+          shippingData: IShippingData;
+          createdAt: string;
+          updatedAt: string;
+        }>
+      >(`${this._URI_CART}/transaction/${id}`)
+    );
+  }
+
   async postCreateTransaction(transactionCartDto: TransactionCartDto) {
     return await firstValueFrom(
       this.httpClient.post<IHttpResponse<Record<string, any>>>(
         `${this._URI_CART}/transaction`,
+        transactionCartDto
+      )
+    );
+  }
+
+  async patchUpdateTransaction(id: string, transactionCartDto: Partial<TransactionCartDto>) {
+    return await firstValueFrom(
+      this.httpClient.patch<IHttpResponse<Record<string, any>>>(
+        `${this._URI_CART}/transaction/${id}`,
         transactionCartDto
       )
     );

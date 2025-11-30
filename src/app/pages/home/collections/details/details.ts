@@ -1,13 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { Toast } from 'primeng/toast';
 import { Carousel } from 'primeng/carousel';
 import { AccordionModule } from 'primeng/accordion';
-import { InputGroup } from 'primeng/inputgroup';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
 import { Button } from 'primeng/button';
 import { SelectButton, SelectButtonChangeEvent } from 'primeng/selectbutton';
 import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
@@ -16,21 +14,29 @@ import { Skeleton } from 'primeng/skeleton';
 import IProductCart from '@/shared/interfaces/cart.interfaces';
 import { Cart } from '@/domain/use-cases/cart';
 import { IOptions } from '@/shared/interfaces';
+import { Message } from 'primeng/message';
+import { Dialog } from 'primeng/dialog';
+import { Listbox } from 'primeng/listbox';
+import { InputNumber } from 'primeng/inputnumber';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-details',
   imports: [
     CommonModule,
+    FormsModule,
     Breadcrumb,
     RouterModule,
     Toast,
     Carousel,
     AccordionModule,
-    InputGroup,
-    InputGroupAddon,
     Button,
+    Message,
     SelectButton,
     Skeleton,
+    Dialog,
+    Listbox,
+    InputNumber,
   ],
   providers: [MessageService],
   templateUrl: './details.html',
@@ -38,7 +44,7 @@ import { IOptions } from '@/shared/interfaces';
 })
 export class Details implements OnInit {
   breadcumItems: MenuItem[] = [{ label: 'Colección', routerLink: '/collections' }];
-  value!: number;
+  amount = 1;
 
   home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
@@ -88,11 +94,22 @@ export class Details implements OnInit {
   }
 
   get productIsInCart() {
-    return this.cart.hasProduct(this._product['id'])
+    return this.cart.hasProduct(this._product['id']);
   }
+
+  get canBuyProduct() {
+    return (
+      this._product.inventory.availableQuantity > 0 ||
+      this._product.variants.some(({ inventory }) => inventory.availableQuantity > 0)
+    );
+  }
+
+  selectedVariant!: string;
+  visible: boolean = false;
 
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly ecommerceInstance: EcommerceService,
     private readonly messageService: MessageService,
     private readonly cart: Cart,
@@ -181,28 +198,30 @@ export class Details implements OnInit {
     }
   }
 
-  addProductToCart() {
-    if (this.cart.hasProduct(this._product.id)) {
-      this.cart.patchProduct(this._product.id, {
-        price: this._product.price[0].price,
-        quantityAvalible: this._product.inventory.availableQuantity,
-        amount: 2,
-      });
-    } else {
-      const productCart = {
-        uuid: this._product.id,
-        name: this._product.name,
-        price: this._product.price[0].price,
-        imagesUrl: this._product.images,
-        quantityAvalible: this._product.inventory.availableQuantity,
-        amount: 1,
-        isSelected: true,
-        description: this._product.description,
-      } satisfies IProductCart;
-
-      this.cart.addProduct(productCart);
+  async addProductToCart() {
+    if (this._product.type === 'variantParent') {
+      this.showDialog();
+      return;
     }
 
+    const productCart = {
+      uuid: this._product.id,
+      name: this._product.name,
+      reference: this._product.reference,
+      type: this._product.type,
+      price: this._product.price[0].price,
+      imagesUrl: this._product.images,
+      quantityAvalible: this._product.inventory.availableQuantity,
+      amount: this.amount,
+      isSelected: true,
+      description: this._product.description,
+    } satisfies IProductCart;
+
+    this.#addProduct(productCart);
+  }
+
+  #addProduct(productCart: IProductCart) {
+    this.cart.addProduct(productCart);
     this.messageService.add({
       severity: 'success',
       summary: 'Producto agregado',
@@ -227,6 +246,10 @@ export class Details implements OnInit {
 
   onColorChange($event: SelectButtonChangeEvent) {
     console.log('[onColorChange] $event', $event);
+    if ($event.value.length === 0) {
+      this.images = this._product.images;
+      return;
+    }
     const variantImages = $event.value.flatMap((value: any) => {
       const variants = this._product.variants.filter((variant) =>
         variant.name.includes(`/ ${value}`)
@@ -234,7 +257,34 @@ export class Details implements OnInit {
       return variants.flatMap(({ images }) => images);
     });
     console.log('variantImages', variantImages);
-    if ($event.value.length === 0 || variantImages.length === 0) this.images = this._product.images;
     this.images = variantImages;
   }
+
+  // #region Modal Methods
+  showDialog() {
+    this.visible = true;
+  }
+
+  confirmAddToCart() {
+    if (!this.selectedVariant) return;
+    const variant = this._product.variants.find(({ id }) => this.selectedVariant === id);
+    if (!variant) return;
+
+    const productCart = {
+      uuid: variant.id,
+      name: variant.name,
+      reference: variant.reference,
+      type: variant.type,
+      price: variant.price[0].price,
+      imagesUrl: variant.images,
+      quantityAvalible: variant.inventory.availableQuantity,
+      amount: this.amount,
+      isSelected: true,
+      description: variant.description,
+    } satisfies IProductCart;
+
+    this.#addProduct(productCart);
+    this.visible = false;
+  }
+  // #endregion
 }

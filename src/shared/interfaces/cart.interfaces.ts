@@ -20,6 +20,7 @@ export interface IFacturationData {
 }
 
 export interface IShippingData {
+  cost: number;
   address?: string | null;
   state?: string | null;
   city?: string | null;

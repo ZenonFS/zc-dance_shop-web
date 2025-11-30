@@ -1,4 +1,5 @@
 export const environment = {
+  selfHost: 'http://localhost:4200',
   // ecommerceUrl: 'http://localhost:12000/v1',
   ecommerceUrl: 'https://api.zcdanceshop.com/ecommerce/v1',
   // geolocationUrl: 'http://localhost:12001/v1',

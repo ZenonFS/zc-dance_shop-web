@@ -8,12 +8,12 @@
       alt="Alt"
       appendTo="body"
       [height]="120"
-      class="block w-full object-cover"
+      class="block w-full object-cover rounded-lg"
     />
   </div>
-  <div class="flex flex-col gap-4 w-full">
+  <div class="flex flex-col gap-2 w-full">
     <span class="text-lg font-bold">{{ product.name }}</span>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
       <span class="font-bold">{{ product.price * product.amount | currency }}</span>
       <span class="text-sm">{{ product.price | currency }} c/u</span>
     </div>

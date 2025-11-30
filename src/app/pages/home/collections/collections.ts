@@ -37,6 +37,8 @@ export class Collections {
     {
       uuid: '1',
       name: '',
+      reference: '',
+      type: '',
       price: 0,
       description: '',
       imagesUrl: [],
@@ -45,6 +47,8 @@ export class Collections {
     {
       uuid: '2',
       name: '',
+      type: '',
+      reference: '',
       price: 0,
       description: '',
       imagesUrl: [],
@@ -53,6 +57,8 @@ export class Collections {
     {
       uuid: '3',
       name: '',
+      type: '',
+      reference: '',
       price: 0,
       description: '',
       imagesUrl: [],
@@ -139,6 +145,8 @@ export class Collections {
       this.setProducts = results.map((product) => ({
         uuid: product['id'],
         name: product['name'],
+        reference: product['reference'],
+        type: product['type'],
         price: product['price'][0]['price'],
         description: product['description'],
         imagesUrl: product['images'] ?? ['/zc.png'],
@@ -163,6 +171,8 @@ export class Collections {
       this.pushProducts = products.map((product) => ({
         uuid: product['id'],
         name: product['name'],
+        reference: product['reference'],
+        type: product['type'],
         price: product['price'][0]['price'],
         description: product['description'],
         imagesUrl: product['images'] ?? ['/zc.png'],

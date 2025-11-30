@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import IProductCart from '@/shared/interfaces/cart.interfaces';
 import { ConfirmationService } from 'primeng/api';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
 import { DateTime } from 'luxon';
 import { environment } from '@/environments/environment';
@@ -34,6 +34,7 @@ import { Tooltip } from 'primeng/tooltip';
     RouterOutlet,
     Popover,
     Tooltip,
+    RouterLink,
   ],
   providers: [ConfirmationService, CurrencyPipe],
   templateUrl: './cart.html',
@@ -66,7 +67,7 @@ export class Cart implements OnInit {
   }
 
   get shippingCostToString() {
-    return this.#cartInstance.cartTotalPrice > 4000000
+    return this.#cartInstance.cartTotalPrice > 400000
       ? 'Gratis'
       : this.#currencyPipe.transform(this.#cartInstance.shippingCost);
   }
@@ -103,8 +104,7 @@ export class Cart implements OnInit {
   get canFinalize() {
     return (
       this.#cartInstance.facturationDataIsValid &&
-      // this.#cartInstance.shippingDataIsValid &&
-      // this.#cartInstance.shippingData.address &&
+      this.#cartInstance.shippingDataIsValid &&
       !!this.transactionReference &&
       !!this.#cartInstance.transactionId
     );
@@ -119,19 +119,31 @@ export class Cart implements OnInit {
     this.transactionReference = transactionReference;
 
     const transactionId = this.#route.snapshot.queryParamMap.get('transactionId');
-    if (transactionId) this.#cartInstance.transactionId = transactionId;
+    if (transactionId) {
+      this.#cartInstance.transactionId = transactionId;
+      this.#loadTransaction(transactionId);
+    }
+  }
+
+  ngOnDestroy() {
+    this.#cartInstance.fgShipping.reset();
+    this.#cartInstance.fgFacturation.reset();
+    this.transactionReference = '';
+    this.#cartInstance.transactionId = null;
+  }
+
+  async #loadTransaction(transactionId: string) {
+    const { results } = await this.#ecommerceInstance.getTransaction(transactionId);
+
+    if (!results) return;
+
+    this.#cartInstance.facturationData = results.facturationData;
+    this.#cartInstance.shippingData = results.shippingData;
+    this.#cartInstance.shippingCost = results.shippingData.cost;
   }
 
   async deleteProduct(uuid: string) {
     await this.#cartInstance.deleteProduct(uuid);
-  }
-
-  selectAll() {
-    console.log(this.isSelectAllProducts);
-
-    this.products.forEach(({ isSelected }) => {
-      isSelected = true;
-    });
   }
 
   confirm(event: Event, product: IProductCart) {
@@ -171,11 +183,6 @@ export class Cart implements OnInit {
       }
       return;
     } else {
-      if (this.canFinalize) {
-        await this.payWithWompi();
-        return;
-      }
-
       const {
         address,
         city,
@@ -267,13 +274,7 @@ export class Cart implements OnInit {
           this.isLoading = false;
         }
 
-      console.log(
-        'this.#cartInstance.facturationDataIsValid',
-        this.#cartInstance.facturationDataIsValid
-      );
-      console.log('this.#cartInstance.shippingDataIsValid', this.#cartInstance.shippingDataIsValid);
-
-      if (this.#cartInstance.facturationDataIsValid && this.#cartInstance.clientId)
+      if (this.#cartInstance.fgFacturation.valid && this.#cartInstance.clientId)
         if (!this.#cartInstance.transactionId)
           try {
             this.isLoading = true;
@@ -302,34 +303,43 @@ export class Cart implements OnInit {
           } finally {
             this.isLoading = false;
           }
-      // else (this.#cartInstance.transactionId)
-      // try {
-      //     this.isLoading = true;
-      //     const { results } = await this.#ecommerceInstance.postCreateTransaction({
-      //       products: this.filteredProducts,
-      //       reference: this.transactionReference,
-      //       facturationData: {
-      //         ...this.#cartInstance.facturationData,
-      //         id: this.#cartInstance.clientId,
-      //       },
-      //       shippingData: this.#cartInstance.shippingData,
-      //     });
+        else if (this.#cartInstance.transactionId) {
+          try {
+            this.isLoading = true;
+            const { results } = await this.#ecommerceInstance.patchUpdateTransaction(
+              this.#cartInstance.transactionId,
+              {
+                products: this.filteredProducts,
+                reference: this.transactionReference,
+                facturationData: {
+                  ...this.#cartInstance.facturationData,
+                  id: this.#cartInstance.clientId,
+                },
+                shippingData: this.#cartInstance.shippingData,
+              }
+            );
 
-      //     if (!results) throw new Error('Results is void');
+            if (!results) throw new Error('Results is void');
 
-      //     this.#cartInstance.transactionId = results['_id'];
-      //     this.#router.navigate([], {
-      //       queryParams: {
-      //         transactionReference: this.transactionReference,
-      //         transactionId: this.#cartInstance.transactionId,
-      //       },
-      //       relativeTo: this.#route,
-      //     });
-      //   } catch (error) {
-      //     console.error('[continue] postCreateTransaction - error', error);
-      //   } finally {
-      //     this.isLoading = false;
-      //   }
+            this.#cartInstance.transactionId = results['_id'];
+            this.#router.navigate([], {
+              queryParams: {
+                transactionReference: this.transactionReference,
+                transactionId: this.#cartInstance.transactionId,
+              },
+              relativeTo: this.#route,
+            });
+          } catch (error) {
+            console.error('[continue] patchUpdateTransaction - error', error);
+          } finally {
+            this.isLoading = false;
+          }
+        }
+
+      if (this.canFinalize) {
+        await this.payWithWompi();
+        return;
+      }
     }
   }
 
@@ -342,10 +352,11 @@ export class Cart implements OnInit {
       reference: this.transactionReference,
       publicKey: environment.wompi.publicKey,
       signature: { integrity: this.signatureIntegrity },
-      redirectUrl: 'http://localhost:4200/check', // Opcional
-      expirationTime: this.expirationTime, // Opcional
+      redirectUrl: `${environment.selfHost}/check?transactionReference=${
+        this.transactionReference
+      }&transactionId=${this.#cartInstance.transactionId}`,
+      expirationTime: this.expirationTime,
       customerData: {
-        // Opcional
         email: this.#cartInstance.facturationData.email,
         fullName: this.#cartInstance.facturationData.fullName,
         phoneNumber: this.#cartInstance.facturationData.phoneNumber,
@@ -354,7 +365,6 @@ export class Cart implements OnInit {
         legalIdType: 'CC',
       },
       // shippingAddress: {
-      //   // Opcional
       //   addressLine1: this.#cartInstance.shippingData.address,
       //   city: this.#cartInstance.shippingData.city,
       //   phoneNumber: this.#cartInstance.shippingData.phoneNumber,
@@ -363,16 +373,15 @@ export class Cart implements OnInit {
       // },
     });
 
-    checkout.open((result: any) => {
-      this.#cartInstance.deleteProducts(this.filteredProducts.map(({ uuid }) => uuid));
+    checkout.open(async (result: any) => {
+      await this.#cartInstance.deleteProducts(this.filteredProducts.map(({ uuid }) => uuid));
 
       const transaction = result.transaction;
-      console.log('Transaction ID: ', transaction.id);
       console.log('Transaction object: ', transaction);
 
       this.#router.navigate(['/check'], {
         queryParams: {
-          transactionReference: this.transactionReference,
+          transactionReference: transaction.reference,
           transactionId: this.#cartInstance.transactionId,
         },
       });

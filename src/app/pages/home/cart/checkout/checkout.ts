@@ -4,8 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
 import {
-  FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
@@ -27,6 +25,7 @@ interface IOption {
   name: string;
   code: string;
   state?: string;
+  postalCode?: string;
 }
 
 @Component({
@@ -69,75 +68,40 @@ export class Checkout implements OnInit {
     { label: 'Persona jurídica', value: 'LEGAL_ENTITY' },
   ];
 
-  fcKindOfPerson = new FormControl<'PERSON_ENTITY' | 'LEGAL_ENTITY'>('PERSON_ENTITY');
   get kindOfPerson() {
-    return this.fcKindOfPerson.value;
+    return this.cartInstance.fcKindOfPerson.value;
   }
-  fcNationalId = new FormControl('', [Validators.required]);
+
   get nationalId() {
-    return this.fcNationalId.value;
+    return this.cartInstance.fcNationalId.value;
   }
   get nationalIdInputMask() {
     return this.kindOfPerson === 'LEGAL_ENTITY' ? '999999999?-9' : '9999?999999';
   }
 
-  fcFullName = new FormControl('');
   get fullname() {
-    return this.fcFullName.value;
+    return this.cartInstance.fcFullName.value;
   }
-  fcFirstName = new FormControl('');
   get firstName() {
-    return this.fcFirstName.value ?? '';
+    return this.cartInstance.fcFirstName.value ?? '';
   }
-  fcSecondName = new FormControl('');
   get secondName() {
-    return this.fcSecondName.value ?? '';
+    return this.cartInstance.fcSecondName.value ?? '';
   }
-  fcLastName = new FormControl('');
   get lastName() {
-    return this.fcLastName.value ?? '';
+    return this.cartInstance.fcLastName.value ?? '';
   }
 
-  fcAddress = new FormControl('');
-  fcState = new FormControl('');
-  fcCity = new FormControl('');
-  fcPhoneNumber = new FormControl('');
   get phoneNumber() {
-    return this.fcPhoneNumber.value;
+    return this.cartInstance.fcPhoneNumber.value;
   }
-  fcEmail = new FormControl('');
   get email() {
-    return this.fcEmail.value;
+    return this.cartInstance.fcEmail.value;
   }
 
-  fgFacturation = new FormGroup({
-    kindOfPerson: this.fcKindOfPerson,
-    nationalId: this.fcNationalId,
-    fullName: this.fcFullName,
-    firstName: this.fcFirstName,
-    secondName: this.fcSecondName,
-    lastName: this.fcLastName,
-    address: this.fcAddress,
-    state: this.fcState,
-    city: this.fcCity,
-    phoneNumber: this.fcPhoneNumber,
-    email: this.fcEmail,
-  });
-
-  #fcUseFacturactionAdressData = new FormControl(false);
   get useFacturactionAdressData() {
-    return this.#fcUseFacturactionAdressData.value;
+    return this.cartInstance.fcUseFacturactionAdressData.value;
   }
-
-  fcShippingState = new FormControl('');
-
-  fgShipping = new FormGroup({
-    useFacturactionAdressData: this.#fcUseFacturactionAdressData,
-    address: new FormControl(''),
-    city: new FormControl(''),
-    state: this.fcShippingState,
-    phoneNumber: new FormControl(''),
-  });
 
   get cartTotalPriceInCents() {
     const cartTotalPrice = String(
@@ -163,6 +127,14 @@ export class Checkout implements OnInit {
     return Array.from(this.#states.values());
   }
 
+  get fgShipping() {
+    return this.cartInstance.fgShipping;
+  }
+
+   get fgFacturation() {
+    return this.cartInstance.fgFacturation;
+  }
+
   constructor(
     public readonly cartInstance: Cart,
     private readonly router: Router,
@@ -180,92 +152,94 @@ export class Checkout implements OnInit {
     const transactionId = this.route.snapshot.queryParamMap.get('transactionId');
     if (transactionId) this.cartInstance.transactionId = transactionId;
 
-    this.fcFullName.disable();
-    this.fcShippingState.disable();
+    this.cartInstance.fcFullName.disable();
+    this.cartInstance.fcShippingState.disable();
 
     this.#registerValueChanges();
     this.#loadCitiesAndStates();
-
-    this.#restoreDraft();
   }
 
   #registerValueChanges() {
-    this.fcKindOfPerson.valueChanges.subscribe((kindOfPerson) => {
-      this.fgFacturation.reset({ kindOfPerson });
+    this.cartInstance.fcKindOfPerson.valueChanges.subscribe((kindOfPerson) => {
+      this.cartInstance.fgFacturation.reset({ kindOfPerson });
       if (!kindOfPerson) return;
       if (kindOfPerson === 'LEGAL_ENTITY') {
-        this.fcFirstName.disable();
-        this.fcSecondName.disable();
-        this.fcLastName.disable();
+        this.cartInstance.fcFirstName.disable();
+        this.cartInstance.fcSecondName.disable();
+        this.cartInstance.fcLastName.disable();
 
-        this.fcFullName.enable();
-        this.fcFullName.addValidators(Validators.required);
+        this.cartInstance.fcFullName.enable();
+        this.cartInstance.fcFullName.addValidators(Validators.required);
       }
       if (kindOfPerson === 'PERSON_ENTITY') {
-        this.fcFullName.disable();
+        this.cartInstance.fcFullName.disable();
 
-        this.fcFirstName.enable();
-        this.fcFirstName.addValidators(Validators.required);
+        this.cartInstance.fcFirstName.enable();
+        this.cartInstance.fcFirstName.addValidators(Validators.required);
 
-        this.fcSecondName.enable();
+        this.cartInstance.fcSecondName.enable();
 
-        this.fcLastName.enable();
-        this.fcLastName.addValidators(Validators.required);
+        this.cartInstance.fcLastName.enable();
+        this.cartInstance.fcLastName.addValidators(Validators.required);
       }
     });
-    this.fcFirstName.valueChanges.subscribe((value) => {
-      this.fcFullName.patchValue(`${value ?? ''} ${this.secondName} ${this.lastName}`);
+    this.cartInstance.fcFirstName.valueChanges.subscribe((value) => {
+      this.cartInstance.fcFullName.patchValue(`${value ?? ''} ${this.secondName} ${this.lastName}`);
     });
-    this.fcSecondName.valueChanges.subscribe((value) => {
-      this.fcFullName.patchValue(`${this.firstName} ${value ?? ''} ${this.lastName}`);
+    this.cartInstance.fcSecondName.valueChanges.subscribe((value) => {
+      this.cartInstance.fcFullName.patchValue(`${this.firstName} ${value ?? ''} ${this.lastName}`);
     });
-    this.fcLastName.valueChanges.subscribe((value) => {
-      this.fcFullName.patchValue(`${this.firstName} ${this.secondName} ${value ?? ''}`);
+    this.cartInstance.fcLastName.valueChanges.subscribe((value) => {
+      this.cartInstance.fcFullName.patchValue(
+        `${this.firstName} ${this.secondName} ${value ?? ''}`
+      );
     });
 
-    this.fcNationalId.valueChanges.pipe(debounceTime(500)).subscribe(async (identification) => {
-      if (identification) {
-        try {
-          const { results } = await this.#ecommerceInstance.getClientByIdentification(
-            identification.replaceAll('_', '')
-          );
-
-          this.cartInstance.isNewClient = !results;
-
-          if (results) {
-            this.cartInstance.clientId = results['id'];
-            this.fgFacturation.patchValue(
-              {
-                nationalId: identification,
-                fullName: results.name,
-                firstName: results.nameObject?.firstName,
-                secondName: results.nameObject?.secondName,
-                lastName: results.nameObject?.lastName,
-                address: results.address.address,
-                state: results.address.department,
-                city: results.address.city,
-                phoneNumber: results.mobile,
-                email: results.email,
-              },
-              { emitEvent: false }
+    this.cartInstance.fcNationalId.valueChanges
+      .pipe(debounceTime(500))
+      .subscribe(async (identification) => {
+        if (identification) {
+          try {
+            const { results } = await this.#ecommerceInstance.getClientByIdentification(
+              identification.replaceAll('_', '')
             );
+
+            this.cartInstance.isNewClient = !results;
+
+            if (results) {
+              this.cartInstance.clientId = results['id'];
+              this.cartInstance.fgFacturation.patchValue(
+                {
+                  nationalId: identification,
+                  fullName: results.name,
+                  firstName: results.nameObject?.firstName,
+                  secondName: results.nameObject?.secondName,
+                  lastName: results.nameObject?.lastName,
+                  address: results.address.address,
+                  state: results.address.department,
+                  city: results.address.city,
+                  phoneNumber: results.mobile,
+                  email: results.email,
+                },
+                { emitEvent: false }
+              );
+            }
+          } catch (error) {
+            console.error(error);
           }
-        } catch (error) {
-          console.error(error);
         }
-      }
-    });
-    this.#fcUseFacturactionAdressData.valueChanges.subscribe((value) => {
+      });
+    this.cartInstance.fcUseFacturactionAdressData.valueChanges.subscribe((value) => {
       if (value) {
-        const { address, city, phoneNumber, state } = this.fgFacturation.controls;
-        this.fgShipping.patchValue({
+        const { address, city, phoneNumber, state } = this.cartInstance.fgFacturation.controls;
+        this.cartInstance.fgShipping.patchValue({
           phoneNumber: phoneNumber.value,
           address: address.value,
           city: city.value,
           state: state.value,
         });
       } else {
-        this.fgShipping.patchValue({
+        this.cartInstance.fgShipping.patchValue({
           phoneNumber: null,
           address: null,
           city: null,
@@ -273,46 +247,59 @@ export class Checkout implements OnInit {
         });
       }
     });
-    this.fgFacturation.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
+    this.cartInstance.fgFacturation.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
       this.cartInstance.facturationData = {
         ...values,
-        fullName: this.fcFullName.value,
-        state: this.fcState.value,
+        fullName: this.cartInstance.fcFullName.value,
+        state: this.cartInstance.fcState.value,
       } satisfies IFacturationData;
-      console.log(this.fgFacturation.valid);
+      console.log('this.fgFacturation.valid', this.cartInstance.fgFacturation.valid);
 
-      this.cartInstance.facturationDataIsValid = this.fgFacturation.valid;
+      this.cartInstance.facturationDataIsValid = this.cartInstance.fgFacturation.valid;
     });
-    this.fgShipping.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
-      this.cartInstance.shippingData = values satisfies IShippingData;
-    });
-  }
 
-  #restoreDraft() {
-    console.log(this.cartInstance.facturationDataFromDraft);
+    this.cartInstance.fgShipping.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
+      this.cartInstance.shippingData = {
+        ...values,
+        cost: this.cartInstance.shippingCost,
+      } satisfies IShippingData;
+      console.log('this.fgShipping.valid', this.cartInstance.fgShipping.valid);
+
+      this.cartInstance.shippingDataIsValid = this.cartInstance.fgShipping.valid;
+    });
+    this.cartInstance.fcShippingCity.valueChanges.subscribe((value) => {
+      if (!value) return;
+
+      const cityMetadata = this.#cities.get(value);
+      if (!cityMetadata) return;
+
+      if (cityMetadata.postalCode === 'domicilio') this.cartInstance.shippingCost = 12000;
+      if (cityMetadata.postalCode === 'interrapidisimo') this.cartInstance.shippingCost = 18000;
+    });
   }
 
   async #loadCitiesAndStates() {
-    this.fcState.disable();
-    this.fcCity.valueChanges.subscribe((value) => {
+    this.cartInstance.fcState.disable();
+    this.cartInstance.fcCity.valueChanges.subscribe((value) => {
       if (!value) return;
       const cityMetadata = this.#cities.get(value);
 
       if (!cityMetadata || !cityMetadata.state) return;
 
-      this.fcState.patchValue(cityMetadata.state);
+      this.cartInstance.fcState.patchValue(cityMetadata.state);
     });
 
     const { results } = await this.#geolocationApiInstance.getCities();
     if (!results) return;
 
-    results.forEach(({ externalId, name, state }) => {
+    results.forEach(({ externalId, name, state, postalCode }) => {
       if (!this.#cities.has(externalId))
-        this.#cities.set(externalId, { code: externalId, name, state });
+        this.#cities.set(externalId, { code: externalId, name, state, postalCode });
 
       if (state) {
         const [code, ...rest] = state?.split('-');
-        if (!this.#states.has(code)) this.#states.set(code, { code, name: rest.join('-') });
+        if (!this.#states.has(code))
+          this.#states.set(code, { code, name: rest.join('-'), postalCode });
       }
     });
   }

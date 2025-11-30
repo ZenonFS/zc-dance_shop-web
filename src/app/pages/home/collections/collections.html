@@ -33,9 +33,12 @@
     <app-product-card
       [uuid]="product.uuid"
       [name]="product.name"
+      [reference]="product.reference"
+      [type]="product.type"
       [description]="product.description"
       [price]="product.price"
       [imagesUrl]="product.imagesUrl"
+      [quantityAvalible]="product.quantityAvalible"
     ></app-product-card>
     } @if(loadingMore) {
     <app-product-card></app-product-card>
