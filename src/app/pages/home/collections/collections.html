@@ -1,10 +1,11 @@
 <div class="flex flex-col px-6 md:px-16 py-8 gap-6">
   <div class="flex flex-wrap bg-[#F1F1F1] rounded-xl p-6 md:p-8 gap-2">
-    <form class="flex flex-wrap gap-2 w-full sm:overflow-auto md:overflow-hidden">
+    <!-- sm:overflow-auto md:overflow-hidden -->
+    <form [formGroup]="fgFilters" class="flex flex-wrap gap-2 w-full">
       @for (filter of filters; track $index) { @if (filter['type'] === 'select') {
       <p-select
+        [formControlName]="filter['formControlName']"
         [options]="filter['options']"
-        (onChange)="onChangeFilter($event, '')"
         optionLabel="value"
         optionValue="id"
         [placeholder]="filter['placeholder']"
@@ -12,6 +13,7 @@
       />
       } @else if (filter['type'] === 'selectbutton') {
       <p-selectbutton
+        [formControlName]="filter['formControlName']"
         [options]="filter['options']"
         [multiple]="true"
         optionLabel="value"
@@ -19,8 +21,20 @@
         class="h-fit"
       />
       } @else { Sin tipo } }
-      <p-button aria-label="Aplicar filtros" label="Aplicar filtros"></p-button>
     </form>
+    @if (!isFormVoid) {
+    <p-button
+      aria-label="Limpiar filtros"
+      label="Limpiar filtros"
+      severity="contrast"
+      (onClick)="cleanFilters()"
+    ></p-button>
+    }
+    <p-button
+      aria-label="Aplicar filtros"
+      label="Aplicar filtros"
+      (onClick)="applyFilters()"
+    ></p-button>
   </div>
 
   <div id="zc--breadcum-lenght" class="flex justify-between items-center p-4">
@@ -29,7 +43,11 @@
   </div>
 
   <div class="px-2 flex justify-center gap-8 flex-wrap">
-    @for (product of products; track $index) {
+    @if (isLoading) {
+    <div class="card flex justify-center">
+      <p-progress-spinner ariaLabel="loading" class="h-[50vh]" />
+    </div>
+    } @else { @for (product of products; track $index) {
     <app-product-card
       [uuid]="product.uuid"
       [name]="product.name"
@@ -42,6 +60,6 @@
     ></app-product-card>
     } @if(loadingMore) {
     <app-product-card></app-product-card>
-    }
+    } }
   </div>
 </div>

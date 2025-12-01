@@ -75,7 +75,7 @@ export class Home {
             label: 'Medias profesionales - Adulto',
             url: '/collections',
             queryParams: {
-              t: 'medias-profesionales-adulto',
+              t: '2',
             },
           },
           {
@@ -83,7 +83,7 @@ export class Home {
             label: 'Medias profesionales - Infantil',
             url: '/collections',
             queryParams: {
-              t: 'medias-profesionales-infantil',
+              t: '3',
             },
           },
           {
@@ -91,7 +91,7 @@ export class Home {
             label: 'Accesorios',
             url: '/collections',
             queryParams: {
-              t: 'accesorios',
+              t: '1',
             },
           },
         ],

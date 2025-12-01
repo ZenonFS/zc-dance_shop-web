@@ -1,20 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ProductCard } from '../../../components/collections/product-card/product-card';
 import { IProduct } from '../../../../shared/interfaces/product.interfaces';
-import { FormControl, FormGroup, FormsModule } from '@angular/forms';
-import { Select, SelectChangeEvent } from 'primeng/select';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { ChipModule } from 'primeng/chip';
 import { ButtonModule } from 'primeng/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
-
-interface ISelectOption {
-  name: string;
-  value: string;
-}
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-collections',
@@ -27,44 +23,14 @@ interface ISelectOption {
     Select,
     SelectButton,
     ChipModule,
+    ReactiveFormsModule,
+    ProgressSpinnerModule,
   ],
   templateUrl: './collections.html',
   styleUrl: './collections.scss',
 })
 export class Collections {
-  // Mocks
-  private _products: IProduct[] = [
-    {
-      uuid: '1',
-      name: '',
-      reference: '',
-      type: '',
-      price: 0,
-      description: '',
-      imagesUrl: [],
-      quantityAvalible: 0,
-    },
-    {
-      uuid: '2',
-      name: '',
-      type: '',
-      reference: '',
-      price: 0,
-      description: '',
-      imagesUrl: [],
-      quantityAvalible: 0,
-    },
-    {
-      uuid: '3',
-      name: '',
-      type: '',
-      reference: '',
-      price: 0,
-      description: '',
-      imagesUrl: [],
-      quantityAvalible: 0,
-    },
-  ];
+  private _products: IProduct[] = [];
 
   get products() {
     return this._products;
@@ -79,6 +45,7 @@ export class Collections {
   private page = 1;
 
   loadingMore = false;
+  isLoading = false;
 
   // * Filters
   private _filters: Record<string, any>[] = [];
@@ -90,27 +57,16 @@ export class Collections {
   }
 
   // Filter Form
-  fgFilters: FormGroup = new FormGroup({
-    fcColor: new FormControl<ISelectOption | null>(null),
-    fcSize: new FormControl<ISelectOption | null>(null),
-    fcType: new FormControl<ISelectOption | null>(null),
+  fgFilters = new FormGroup({
+    fcColor: new FormControl<string[] | null>(null),
+    fcSize: new FormControl<string[] | null>(null),
+    fcType: new FormControl<string | null>(null),
   });
 
-  // get selectedColor() {
-  //   return this.fgFilters.controls.fcColor.value?.value;
-  // }
-
-  // get selectedSize() {
-  //   return this.fgFilters.controls.fcSize.value?.value;
-  // }
-
-  // get selectedType() {
-  //   return this.fgFilters.controls.fcType.value?.value;
-  // }
-
-  // set setSelectedType(selectedOption: ISelectOption) {
-  //   this.fgFilters.controls.fcType.patchValue(selectedOption);
-  // }
+  get isFormVoid() {
+    const { fcColor, fcSize, fcType } = this.fgFilters.value;
+    return !fcColor && !fcSize && !fcType;
+  }
 
   get totalProducts() {
     return this.products.length;
@@ -118,19 +74,56 @@ export class Collections {
 
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly ecommerceInstance: EcommerceService
   ) {}
 
   async ngOnInit() {
-    await Promise.all([this._getProducts(true), this._getFilters()]);
+    this.#registerOnChangeFilters();
+    await this._getFilters();
+    this.#getQueryParams();
 
+    const { fcColor, fcSize, fcType } = this.fgFilters.value;
+
+    await this._getProducts(true, {
+      t: fcType ? fcType : '',
+      s: fcSize ? fcSize.join(',') : '',
+      c: fcColor ? fcColor.join(',') : '',
+    });
+  }
+
+  #registerOnChangeFilters() {
+    this.fgFilters.valueChanges.subscribe((values) => {
+      if (values) {
+        const { fcColor, fcSize, fcType } = values;
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            t: fcType ? fcType : '',
+            s: fcSize ? fcSize.join(',') : '',
+            c: fcColor ? fcColor.join(',') : '',
+          },
+        });
+      }
+    });
+  }
+
+  #getQueryParams() {
     const qpType = this.route.snapshot.queryParamMap.get('t');
-    console.log('qpType', qpType);
 
     if (qpType) {
-      // const type = this.types.find(({ value }) => value === qpType);
-      // console.log('type', type);
-      // if (type) this.fgFilters.controls.fcType.patchValue(type);
+      this.fgFilters.controls.fcType.patchValue(qpType);
+    }
+
+    const qpSize = this.route.snapshot.queryParamMap.get('s');
+    if (qpSize) {
+      this.fgFilters.controls.fcSize.patchValue(qpSize.split(','));
+    }
+
+    const qpColor = this.route.snapshot.queryParamMap.get('c');
+    if (qpColor) {
+      this.fgFilters.controls.fcColor.patchValue(qpColor.split(','));
     }
   }
 
@@ -140,19 +133,44 @@ export class Collections {
   }
 
   private async _getProducts(loadAllProducts: boolean, params?: Record<string, string>) {
-    const { results } = await this.ecommerceInstance.getProducts(params);
-    if (results && loadAllProducts)
-      this.setProducts = results.map((product) => ({
-        uuid: product['id'],
-        name: product['name'],
-        reference: product['reference'],
-        type: product['type'],
-        price: product['price'][0]['price'],
-        description: product['description'],
-        imagesUrl: product['images'] ?? ['/zc.png'],
-        quantityAvalible: product['inventory']['availableQuantity'],
-      }));
-    return results;
+    this.isLoading = true;
+    try {
+      const { results } = await this.ecommerceInstance.getProducts(params);
+      if (results && loadAllProducts)
+        this.setProducts = results.map((product) => ({
+          uuid: product['id'],
+          name: product['name'],
+          reference: product['reference'],
+          type: product['type'],
+          price: product['price'][0]['price'],
+          description: product['description'],
+          imagesUrl: product['images'] ?? ['/zc.png'],
+          quantityAvalible: product['inventory']['availableQuantity'],
+        }));
+      return results;
+    } catch (error) {
+      console.error(error);
+
+      return [];
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  cleanFilters() {
+    this.fgFilters.reset();
+
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+  }
+
+  async applyFilters() {
+    const { fcColor, fcSize, fcType } = this.fgFilters.value;
+
+    await this._getProducts(true, {
+      t: fcType ? fcType : '',
+      s: fcSize ? fcSize.join(',') : '',
+      c: fcColor ? fcColor.join(',') : '',
+    });
   }
 
   private async _loadMoreProducts() {
@@ -181,11 +199,6 @@ export class Collections {
 
       if (products.length < 25) this.page = -1;
     }
-  }
-
-  onChangeFilter($event: SelectChangeEvent, inputRef: string) {
-    console.log($event.value);
-    // this.setSelectedType = $event.value;
   }
 
   @HostListener('window:scroll', [])
