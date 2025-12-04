@@ -127,7 +127,7 @@ export class Cart implements OnInit {
 
   ngOnDestroy() {
     this.#cartInstance.fgShipping.reset();
-    this.#cartInstance.fgFacturation.reset();
+    this.#cartInstance.fgFacturation.reset({ kindOfPerson: 'PERSON_ENTITY' });
     this.transactionReference = '';
     this.#cartInstance.transactionId = null;
   }
@@ -182,7 +182,7 @@ export class Cart implements OnInit {
         this.isLoading = false;
       }
       return;
-    } else {
+    } else if (this.#cartInstance.fgFacturation.valid) {
       const {
         address,
         city,
@@ -334,12 +334,17 @@ export class Cart implements OnInit {
           } finally {
             this.isLoading = false;
           }
+        } else {
+          this.#cartInstance.fgFacturation.markAllAsTouched();
+          return;
         }
 
       if (this.canFinalize) {
         await this.payWithWompi();
         return;
       }
+    } else {
+      this.#cartInstance.fgFacturation.markAllAsTouched();
     }
   }
 
