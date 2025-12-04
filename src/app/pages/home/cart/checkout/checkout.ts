@@ -3,11 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputGroup, InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
 import { FloatLabelModule } from 'primeng/floatlabel';
@@ -20,6 +16,7 @@ import { IFacturationData, IShippingData } from '@/shared/interfaces/cart.interf
 import { SelectButton } from 'primeng/selectbutton';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { CommonModule } from '@angular/common';
+import { TitlecaseEsPipe } from '@/app/pipes/titlecase-es-pipe';
 
 interface IOption {
   name: string;
@@ -45,12 +42,14 @@ interface IOption {
     SelectButton,
     AutoComplete,
   ],
+  providers: [TitlecaseEsPipe],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
 })
 export class Checkout implements OnInit {
   readonly #ecommerceInstance = inject(EcommerceService);
   readonly #geolocationApiInstance = inject(GeolocationAPI);
+  readonly #titleCasePipe = inject(TitlecaseEsPipe);
 
   transactionReference!: string;
   #signatureIntegrity!: string;
@@ -76,7 +75,7 @@ export class Checkout implements OnInit {
     return this.cartInstance.fcNationalId.value;
   }
   get nationalIdInputMask() {
-    return this.kindOfPerson === 'LEGAL_ENTITY' ? '999999999?-9' : '9999?999999';
+    return this.kindOfPerson === 'LEGAL_ENTITY' ? '999999999?-9' : '9?999999999';
   }
 
   get fullname() {
@@ -131,7 +130,7 @@ export class Checkout implements OnInit {
     return this.cartInstance.fgShipping;
   }
 
-   get fgFacturation() {
+  get fgFacturation() {
     return this.cartInstance.fgFacturation;
   }
 
@@ -196,7 +195,7 @@ export class Checkout implements OnInit {
     });
 
     this.cartInstance.fcNationalId.valueChanges
-      .pipe(debounceTime(500))
+      .pipe(debounceTime(600))
       .subscribe(async (identification) => {
         if (identification) {
           try {
@@ -223,6 +222,7 @@ export class Checkout implements OnInit {
                 },
                 { emitEvent: false }
               );
+              this.cartInstance.fgFacturation.updateValueAndValidity();
             }
           } catch (error) {
             console.error(error);
@@ -255,6 +255,12 @@ export class Checkout implements OnInit {
       } satisfies IFacturationData;
       console.log('this.fgFacturation.valid', this.cartInstance.fgFacturation.valid);
 
+      if (this.cartInstance.fgFacturation.invalid) {
+        this.cartInstance.fgFacturation.markAllAsDirty();
+        this.cartInstance.fgFacturation.markAsPristine();
+        this.cartInstance.fgFacturation.markAllAsTouched();
+      }
+
       this.cartInstance.facturationDataIsValid = this.cartInstance.fgFacturation.valid;
     });
 
@@ -280,21 +286,30 @@ export class Checkout implements OnInit {
 
   async #loadCitiesAndStates() {
     this.cartInstance.fcState.disable();
+    this.cartInstance.fcState.valueChanges.subscribe((value) => {
+      if (value)
+        this.cartInstance.fcState.patchValue(this.#titleCasePipe.transform(value), {
+          emitEvent: false,
+        });
+    });
     this.cartInstance.fcCity.valueChanges.subscribe((value) => {
       if (!value) return;
       const cityMetadata = this.#cities.get(value);
 
       if (!cityMetadata || !cityMetadata.state) return;
 
-      this.cartInstance.fcState.patchValue(cityMetadata.state);
+      this.cartInstance.fcState.patchValue(cityMetadata.state.split('-').pop()?.trim() ?? '');
+      this.cartInstance.fcCity.patchValue(this.#titleCasePipe.transform(value), {
+        emitEvent: false,
+      });
     });
 
     const { results } = await this.#geolocationApiInstance.getCities();
     if (!results) return;
 
     results.forEach(({ externalId, name, state, postalCode }) => {
-      if (!this.#cities.has(externalId))
-        this.#cities.set(externalId, { code: externalId, name, state, postalCode });
+      if (!this.#cities.has(name))
+        this.#cities.set(name, { code: externalId, name: name, state, postalCode });
 
       if (state) {
         const [code, ...rest] = state?.split('-');
