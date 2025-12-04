@@ -28,16 +28,5 @@ export const routes: Routes = [
       { path: 'cart', component: Cart, children: [{ path: 'checkout', component: Checkout }] },
     ],
   },
-  // { path: 'auth', component: Auth },
-  // {
-  //   path: 'admin',
-  //   component: Admin,
-  //   children: [
-  //     { path: '', component: Dashboard },
-  //     { path: 'orders', component: Orders },
-  //     { path: 'shipments', component: Shipments },
-  //     { path: '**', redirectTo: '' },
-  //   ],
-  // },
   { path: '**', redirectTo: '' },
 ];
