@@ -37,11 +37,12 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
   styleUrl: './home.scss',
 })
 export class Home {
+
   items: MenuItem[] | undefined;
   visible: boolean = false;
 
   get filteredProducts() {
-    return this.cart.products.filter(({isSelected}) => isSelected)
+    return this.cart.products.filter(({ isSelected }) => isSelected);
   }
 
   constructor(
@@ -69,11 +70,13 @@ export class Home {
             id: 'todas',
             label: 'Todas',
             url: '/collections',
+            replaceUrl: true,
           },
           {
             id: 'medias-profesionales-adulto',
             label: 'Medias profesionales - Adulto',
             url: '/collections',
+            replaceUrl: true,
             queryParams: {
               t: '2',
             },
@@ -82,6 +85,7 @@ export class Home {
             id: 'medias-profesionales-junior',
             label: 'Medias profesionales - Infantil',
             url: '/collections',
+            replaceUrl: true,
             queryParams: {
               t: '3',
             },
@@ -90,6 +94,7 @@ export class Home {
             id: 'accesorios',
             label: 'Accesorios',
             url: '/collections',
+            replaceUrl: true,
             queryParams: {
               t: '1',
             },
@@ -103,6 +108,8 @@ export class Home {
         url: '/faq',
       },
     ];
+
+
   }
 
   navigateToAuth() {

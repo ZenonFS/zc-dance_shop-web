@@ -10,7 +10,6 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputMask } from 'primeng/inputmask';
 import { debounceTime } from 'rxjs';
 import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
-import { ToggleButton } from 'primeng/togglebutton';
 import { GeolocationAPI } from '@/domain/api/rest/geolocation.api';
 import { IFacturationData, IShippingData } from '@/shared/interfaces/cart.interfaces';
 import { SelectButton } from 'primeng/selectbutton';
@@ -30,7 +29,6 @@ interface IOption {
   imports: [
     CommonModule,
     Card,
-    ToggleButton,
     Divider,
     InputMask,
     FormsModule,
@@ -65,6 +63,11 @@ export class Checkout implements OnInit {
   kindOfPersonOptions = [
     { label: 'Persona natural', value: 'PERSON_ENTITY' },
     { label: 'Persona jurídica', value: 'LEGAL_ENTITY' },
+  ];
+
+  useFacturactionAdressDataOptions = [
+    { label: 'Sí', value: true },
+    { label: 'No', value: false },
   ];
 
   get kindOfPerson() {

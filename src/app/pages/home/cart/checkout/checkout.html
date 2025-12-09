@@ -109,15 +109,14 @@
       <label for="area-metropolitana" class="ml-2"
         >¿Desea utilizar la misma dirección de la facturación?</label
       >
-      <p-togglebutton
+      <p-selectbutton
+        [options]="useFacturactionAdressDataOptions"
         formControlName="useFacturactionAdressData"
-        id="useFacturactionAdressData"
-        name="useFacturactionAdressData"
-        onLabel="Sí"
-        offLabel="No"
-        class="w-20"
-        [disabled]="fgFacturation.invalid"
-      />
+        optionLabel="label"
+        optionValue="value"
+        aria-labelledby="basic"
+        [invalid]="fgFacturation.invalid"
+        />
     </div>
 
     <p-divider />

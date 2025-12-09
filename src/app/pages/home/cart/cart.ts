@@ -335,6 +335,7 @@ export class Cart implements OnInit {
             this.isLoading = false;
           }
         } else {
+          this.#cartInstance.fgFacturation.markAllAsDirty();
           this.#cartInstance.fgFacturation.markAllAsTouched();
           return;
         }
@@ -342,8 +343,12 @@ export class Cart implements OnInit {
       if (this.canFinalize) {
         await this.payWithWompi();
         return;
+      } else {
+        this.#cartInstance.fgShipping.markAllAsDirty();
+        this.#cartInstance.fgShipping.markAllAsTouched();
       }
     } else {
+      this.#cartInstance.fgFacturation.markAllAsDirty();
       this.#cartInstance.fgFacturation.markAllAsTouched();
     }
   }
