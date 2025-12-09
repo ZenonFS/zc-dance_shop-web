@@ -23,12 +23,19 @@
   align-items: center;
   gap: 1rem;
 
-  .p-image,
+  .zc--img-h.p-image,
   img {
-    border-radius: 0.5rem;
+    position: relative;
     height: 450px;
     width: fit-content;
   }
+
+  .zc--img-v.p-image,
+  img {
+    position: relative;
+    width: fit-content;
+  }
+
   p {
     text-align: center;
     font-size: 1.5em;

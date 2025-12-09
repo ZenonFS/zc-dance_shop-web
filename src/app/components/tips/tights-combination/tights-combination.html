@@ -6,7 +6,7 @@
 <div class="flex flex-wrap items-center justify-center gap-12 lg:gap-18">
   @for (item of section.items; track $index) {
   <div class="zc--card">
-    <p-image [src]="item.imageUrl" [alt]="item.imageAlt" preview />
+    <p-image [src]="item.imageUrl" [alt]="item.imageAlt" [class]=" item.imageAlt === 'skin-tone-medium-2.3' ? 'zc--img-v' :  'zc--img-h'" preview />
     <p [innerHTML]="item.description" ></p>
   </div>
   }
