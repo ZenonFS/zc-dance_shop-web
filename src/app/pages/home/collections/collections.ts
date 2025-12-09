@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ProductCard } from '../../../components/collections/product-card/product-card';
 import { IProduct } from '../../../../shared/interfaces/product.interfaces';
@@ -30,6 +30,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   styleUrl: './collections.scss',
 })
 export class Collections {
+  #activatedRoute = inject(ActivatedRoute);
+
   private _products: IProduct[] = [];
 
   get products() {
@@ -79,6 +81,11 @@ export class Collections {
   ) {}
 
   async ngOnInit() {
+    this.#activatedRoute.queryParams.subscribe(({t}) => {
+      this.fgFilters.controls.fcType.patchValue(t ?? null);
+      this.applyFilters();
+    });
+
     this.#registerOnChangeFilters();
     await this._getFilters();
     this.#getQueryParams();

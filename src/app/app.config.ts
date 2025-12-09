@@ -13,6 +13,7 @@ import Lara from '@primeuix/themes/lara';
 import { definePreset } from '@primeuix/themes';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHotToastConfig } from '@ngxpert/hot-toast';
 
 const ZC = definePreset(Lara, {
   semantic: {
@@ -44,6 +45,7 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
       })
     ),
+     provideHotToastConfig(),
     provideAnimationsAsync(),
     providePrimeNG({
       translation: {

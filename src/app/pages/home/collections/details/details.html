@@ -1,6 +1,11 @@
 <p-toast />
 <p-breadcrumb [home]="home" [model]="breadcumItems" />
 
+@if (isLoading) {
+<div class="card flex justify-center">
+  <p-progress-spinner ariaLabel="loading" class="h-[50vh]" />
+</div>
+} @else {
 <div id="content" class="flex flex-col md:flex-row gap-6">
   <div class="lg:w-[50%]">
     <p-carousel
@@ -12,7 +17,7 @@
       class="h-full rounded-lg"
     >
       <ng-template let-image #item>
-        <div class="relative h-[60vh] flex items-center justify-center">
+        <div class="relative h-[50vh] lg:h-[60vh] flex items-center justify-center">
           <img
             [src]="image.url ?? '/zc.png'"
             alt="ZC Imágen de Producto"
@@ -44,15 +49,15 @@
         <p-accordion-header><span class="text-xl">Colores</span></p-accordion-header>
         <p-accordion-content>
           <div id="colors">
-            @if (colors.length === 0) {
+            @if (colors.length === 0 || onChanging) {
             <p-skeleton class="p-5" width="50%"></p-skeleton>
 
             } @else {
             <p-selectbutton
+              #colorSelect
               [options]="colors"
-              [multiple]="true"
-              optionLabel="value"
               (onChange)="onColorChange($event)"
+              optionLabel="value"
               optionValue="value"
               optionDisabled="isDisabled"
             />
@@ -65,13 +70,13 @@
         <p-accordion-header><span class="text-xl">Tallas</span></p-accordion-header>
         <p-accordion-content>
           <div id="sizes">
-            @if (sizes.length === 0) {
+            @if (sizes.length === 0 || onChanging) {
             <p-skeleton class="p-5" width="50%"></p-skeleton>
 
             } @else {
             <p-selectbutton
+              #sizeSelect
               [options]="sizes"
-              [multiple]="true"
               (onChange)="onSizeChange($event)"
               optionLabel="value"
               optionValue="value"
@@ -117,7 +122,13 @@
 
       <p-button
         icon="pi pi-shopping-bag"
-        [label]="productIsInCart ? 'Producto en la bolsa' : product.type === 'variantParent' ? 'Seleccionar variante' : 'Añadir a mi bolsa'"
+        [label]="
+          productIsInCart
+            ? 'Producto en la bolsa'
+            : product.type === 'variantParent'
+            ? 'Seleccionar variante'
+            : 'Añadir a mi bolsa'
+        "
         [disabled]="productIsInCart"
         class="w-full"
         (click)="addProductToCart()"
@@ -129,6 +140,7 @@
     }
   </div>
 </div>
+}
 
 <p-dialog
   header="Selecciona una variante"

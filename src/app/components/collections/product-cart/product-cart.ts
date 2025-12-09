@@ -1,5 +1,5 @@
 import { FormsModule } from '@angular/forms';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import IProductCart from '../../../../shared/interfaces/cart.interfaces';
 import { CommonModule } from '@angular/common';
 import { ImageModule } from 'primeng/image';
@@ -10,6 +10,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Cart } from '@/domain/use-cases/cart';
 import { InputNumber } from 'primeng/inputnumber';
+import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
 
 @Component({
   selector: 'app-product-cart',
@@ -28,11 +29,12 @@ import { InputNumber } from 'primeng/inputnumber';
   styleUrl: './product-cart.scss',
 })
 export class ProductCart {
+  #hotToast = inject(HotToastClass);
+
   @Input() product!: IProductCart;
 
   constructor(
     private readonly confirmationService: ConfirmationService,
-    private readonly messageService: MessageService,
     private readonly cartInstance: Cart
   ) {}
 
@@ -55,11 +57,7 @@ export class ProductCart {
 
       accept: () => {
         this.cartInstance.deleteProduct(this.product.uuid);
-        this.messageService.add({
-          severity: 'info',
-          summary: '¡Eliminado!',
-          detail: 'Producto eliminado',
-        });
+        this.#hotToast.successNotification(`Producto eliminado`);
       },
     });
   }

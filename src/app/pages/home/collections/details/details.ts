@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MenuItem, MessageService } from 'primeng/api';
+import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { MenuItem } from 'primeng/api';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { Toast } from 'primeng/toast';
 import { Carousel } from 'primeng/carousel';
@@ -19,6 +19,8 @@ import { Dialog } from 'primeng/dialog';
 import { Listbox } from 'primeng/listbox';
 import { InputNumber } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
 
 @Component({
   selector: 'app-details',
@@ -37,12 +39,18 @@ import { FormsModule } from '@angular/forms';
     Dialog,
     Listbox,
     InputNumber,
+    ProgressSpinner,
   ],
-  providers: [MessageService],
+  providers: [],
   templateUrl: './details.html',
   styleUrl: './details.scss',
 })
 export class Details implements OnInit {
+  #hotToast = inject(HotToastClass);
+
+  @ViewChild('sizeSelect') sizeSelectRef!: SelectButton;
+  @ViewChild('colorSelect') colorSelectRef!: SelectButton;
+
   breadcumItems: MenuItem[] = [{ label: 'Colección', routerLink: '/collections' }];
   amount = 1;
 
@@ -58,7 +66,7 @@ export class Details implements OnInit {
     },
     {
       breakpoint: '1199px',
-      numVisible: 2,
+      numVisible: 1,
       numScroll: 1,
     },
     {
@@ -72,6 +80,8 @@ export class Details implements OnInit {
       numScroll: 1,
     },
   ];
+
+  isLoading = true;
 
   private _uuid!: string;
   private _product!: IProduct & {
@@ -106,12 +116,11 @@ export class Details implements OnInit {
 
   selectedVariant!: string;
   visible: boolean = false;
+  onChanging = false;
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
     private readonly ecommerceInstance: EcommerceService,
-    private readonly messageService: MessageService,
     private readonly cart: Cart,
     private readonly cd: ChangeDetectorRef
   ) {}
@@ -127,25 +136,31 @@ export class Details implements OnInit {
   }
 
   async #getFilters() {
-    const { results } = await this.ecommerceInstance.getProductsFilters();
-    if (results) {
-      this.#colorsOptions = results[2]
-        ? results[2]['options'].map((option: any) => ({
-            ...option,
-            isDisabled: this._product.colorsMap
-              ? !this._product.colorsMap.has(option['value'])
-              : false,
-          }))
-        : [];
+    this.isLoading = true;
+    try {
+      const { results } = await this.ecommerceInstance.getProductsFilters();
+      if (results) {
+        this.#colorsOptions = results[2]
+          ? results[2]['options'].map((option: any) => ({
+              ...option,
+              isDisabled: this._product.colorsMap
+                ? !this._product.colorsMap.has(option['value'])
+                : false,
+            }))
+          : [];
 
-      this.#sizesOptions = results[1]
-        ? results[1]['options'].map((option: any) => ({
-            ...option,
-            isDisabled: this._product.sizesMap
-              ? !this._product.sizesMap.has(option['value'])
-              : false,
-          }))
-        : [];
+        this.#sizesOptions = results[1]
+          ? results[1]['options'].map((option: any) => ({
+              ...option,
+              isDisabled: this._product.sizesMap
+                ? !this._product.sizesMap.has(option['value'])
+                : false,
+            }))
+          : [];
+      }
+    } catch (error) {
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -222,42 +237,91 @@ export class Details implements OnInit {
 
   #addProduct(productCart: IProductCart) {
     this.cart.addProduct(productCart);
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Producto agregado',
-      detail: `${this._product.name} ha sido añadido a la cesta.`,
-      life: 3000,
-      contentStyleClass: 'test-test',
-    });
+    this.#hotToast.successNotification(`${this._product.name} ha sido añadido a la cesta.`);
   }
 
   onSizeChange($event: SelectButtonChangeEvent) {
-    console.log('[onSizeChange] $event', $event);
-    if ($event.value.length === 0) this.images = this._product.images;
-    $event.value.forEach((value: any) => {
-      const variants = this._product.variants.filter((variant) =>
-        variant.name.includes(`/ ${value} /`)
-      );
-      const variantImages = variants.flatMap(({ images }) => images);
-      console.log(value, 'variantImages', variantImages);
-      this.images = variantImages;
-    });
+    this.onChanging = true;
+    if (!$event.value) {
+      this.colorSelectRef.value = undefined;
+      this.images = this._product.images;
+      this.#colorsOptions.forEach((colorOption) => {
+        colorOption.isDisabled = this._product.colorsMap
+          ? !this._product.colorsMap.has(colorOption.value)
+          : false;
+      });
+      this.#sizesOptions.forEach((sizeOption) => {
+        sizeOption.isDisabled = this._product.sizesMap
+          ? !this._product.sizesMap.has(sizeOption.value)
+          : false;
+      });
+      // Forzar cambio de referencia
+      this.#colorsOptions = [...this.#colorsOptions];
+      this.onChanging = false;
+      this.cd.detectChanges();
+      return;
+    }
+
+    const variants = this._product.variants.filter((variant) =>
+      variant.name.includes(
+        this.colorSelectRef.value
+          ? `/ ${$event.value} / ${this.colorSelectRef.value}`
+          : `/ ${$event.value} /`
+      )
+    );
+    this.images = variants.flatMap(({ images }) => images);
+
+    const colorsRelated = this._product.sizesMap?.get($event.value);
+    if (colorsRelated) {
+      this.#colorsOptions.forEach((colorOption) => {
+        colorOption.isDisabled = !colorsRelated.includes(colorOption.value);
+      });
+      // Forzar cambio de referencia
+      this.#colorsOptions = [...this.#colorsOptions];
+    }
+    this.onChanging = false;
+    this.cd.detectChanges();
   }
 
   onColorChange($event: SelectButtonChangeEvent) {
-    console.log('[onColorChange] $event', $event);
-    if ($event.value.length === 0) {
+    this.onChanging = true;
+    if (!$event.value) {
+      this.sizeSelectRef.value = undefined;
       this.images = this._product.images;
+      this.#colorsOptions.forEach((colorOption) => {
+        colorOption.isDisabled = this._product.colorsMap
+          ? !this._product.colorsMap.has(colorOption.value)
+          : false;
+      });
+      this.#sizesOptions.forEach((sizeOption) => {
+        sizeOption.isDisabled = this._product.sizesMap
+          ? !this._product.sizesMap.has(sizeOption.value)
+          : false;
+      });
+      this.#sizesOptions = [...this.#sizesOptions];
+      this.onChanging = false;
+      this.cd.detectChanges();
       return;
     }
-    const variantImages = $event.value.flatMap((value: any) => {
-      const variants = this._product.variants.filter((variant) =>
-        variant.name.includes(`/ ${value}`)
-      );
-      return variants.flatMap(({ images }) => images);
-    });
-    console.log('variantImages', variantImages);
-    this.images = variantImages;
+
+    const variants = this._product.variants.filter((variant) =>
+      variant.name.includes(
+        this.sizeSelectRef.value
+          ? `/ ${this.sizeSelectRef.value} / ${$event.value}`
+          : `/ ${$event.value}`
+      )
+    );
+    this.images = variants.flatMap(({ images }) => images);
+
+    const sizesRelated = this._product.colorsMap?.get($event.value);
+    if (sizesRelated) {
+      this.#sizesOptions.forEach((sizeOption) => {
+        sizeOption.isDisabled = !sizesRelated.includes(sizeOption.value);
+      });
+      this.#sizesOptions = [...this.#sizesOptions];
+    }
+    this.onChanging = false;
+    this.cd.detectChanges();
   }
 
   // #region Modal Methods

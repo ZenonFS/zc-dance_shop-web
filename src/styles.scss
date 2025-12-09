@@ -1,3 +1,4 @@
+@use '@ngxpert/hot-toast/src/styles/styles.scss';
 @use 'tailwindcss';
 @plugin "tailwindcss-primeui";
 
@@ -15,12 +16,19 @@
   font-style: normal;
 }
 
-
 @theme {
   --font-lovelo: Lovelo, sans-serif;
   --font-advent-pro: 'Advent Pro', sans-serif;
   --font-display: Lovelo, sans-serif;
   --font-sans: Lovelo, sans-serif;
+}
+:root {
+  --p-accordion-header-first-border-width: 0 0 1px 0;
+  --p-accordion-header-border-width: 0 0 1px 0;
+}
+
+.p-accordioncontent-content {
+  border-radius: 0 0 1rem 1rem;
 }
 
 body {
@@ -36,7 +44,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-p, a, span, li, b, i, label, input, .p-toast-detail, .p-tooltip, .p-badge, .p-card-subtitle, td, th  {
+p,
+a,
+span,
+li,
+b,
+i,
+label,
+input,
+.p-toast-detail,
+.p-tooltip,
+.p-badge,
+.p-card-subtitle,
+td,
+th {
   font-family: 'Advent Pro', sans-serif;
 }
 

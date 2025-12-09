@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
@@ -10,7 +10,6 @@ import { Cart } from '@/domain/use-cases/cart';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Carousel } from 'primeng/carousel';
 import { IImage } from '@/shared/interfaces/product-details.interfaces';
-import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { EcommerceService } from '@/domain/api/rest/ecommerce.service';
 import { Dialog } from 'primeng/dialog';
@@ -19,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { ListboxModule } from 'primeng/listbox';
 import { InputNumber } from 'primeng/inputnumber';
 import { Tag } from 'primeng/tag';
+import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-product-card',
@@ -40,6 +41,8 @@ import { Tag } from 'primeng/tag';
   styleUrl: './product-card.scss',
 })
 export class ProductCard implements IProduct {
+  #hotToast = inject(HotToastClass);
+
   @Input() uuid!: string;
   @Input() name!: string;
   @Input() reference!: string;
@@ -108,7 +111,6 @@ export class ProductCard implements IProduct {
     private readonly cart: Cart,
     private readonly ecommerceInstance: EcommerceService,
     private readonly router: Router,
-    private readonly messageService: MessageService,
     private readonly route: ActivatedRoute
   ) {}
 
@@ -158,13 +160,7 @@ export class ProductCard implements IProduct {
   #addProduct(productCart: IProductCart) {
     this.cart.addProduct(productCart);
 
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Producto agregado',
-      detail: `${this.name} ha sido añadido a la cesta.`,
-      life: 3000,
-      contentStyleClass: 'test-test',
-    });
+    this.#hotToast.successNotification(`${this.name} ha sido añadido a la cesta.`);
   }
 
   async goToDetails() {
