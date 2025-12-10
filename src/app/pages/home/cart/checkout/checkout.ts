@@ -250,32 +250,7 @@ export class Checkout implements OnInit {
         });
       }
     });
-    this.cartInstance.fgFacturation.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
-      this.cartInstance.facturationData = {
-        ...values,
-        fullName: this.cartInstance.fcFullName.value,
-        state: this.cartInstance.fcState.value,
-      } satisfies IFacturationData;
-      console.log('this.fgFacturation.valid', this.cartInstance.fgFacturation.valid);
 
-      if (this.cartInstance.fgFacturation.invalid) {
-        this.cartInstance.fgFacturation.markAllAsDirty();
-        this.cartInstance.fgFacturation.markAsPristine();
-        this.cartInstance.fgFacturation.markAllAsTouched();
-      }
-
-      this.cartInstance.facturationDataIsValid = this.cartInstance.fgFacturation.valid;
-    });
-
-    this.cartInstance.fgShipping.valueChanges.pipe(debounceTime(500)).subscribe((values) => {
-      this.cartInstance.shippingData = {
-        ...values,
-        cost: this.cartInstance.shippingCost,
-      } satisfies IShippingData;
-      console.log('this.fgShipping.valid', this.cartInstance.fgShipping.valid);
-
-      this.cartInstance.shippingDataIsValid = this.cartInstance.fgShipping.valid;
-    });
     this.cartInstance.fcShippingCity.valueChanges.subscribe((value) => {
       if (!value) return;
 
@@ -289,22 +264,18 @@ export class Checkout implements OnInit {
 
   async #loadCitiesAndStates() {
     this.cartInstance.fcState.disable();
-    this.cartInstance.fcState.valueChanges.subscribe((value) => {
-      if (value)
-        this.cartInstance.fcState.patchValue(this.#titleCasePipe.transform(value), {
-          emitEvent: false,
-        });
-    });
+
     this.cartInstance.fcCity.valueChanges.subscribe((value) => {
       if (!value) return;
       const cityMetadata = this.#cities.get(value);
 
       if (!cityMetadata || !cityMetadata.state) return;
 
+      this.cartInstance.fcState.enable();
       this.cartInstance.fcState.patchValue(cityMetadata.state.split('-').pop()?.trim() ?? '');
-      this.cartInstance.fcCity.patchValue(this.#titleCasePipe.transform(value), {
-        emitEvent: false,
-      });
+      this.cartInstance.fcState.disable();
+
+      // this.cartInstance.fgFacturation.patchValue({ state: cityMetadata.state.split('-').pop()?.trim() ?? '' });
     });
 
     const { results } = await this.#geolocationApiInstance.getCities();

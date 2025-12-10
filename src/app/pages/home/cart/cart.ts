@@ -17,6 +17,7 @@ import { environment } from '@/environments/environment';
 import { CreateContactDTO, UpdateContactDTO } from '@/shared/interfaces/clients.interfaces';
 import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
+import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
 
 @Component({
   selector: 'app-cart',
@@ -48,6 +49,7 @@ export class Cart implements OnInit {
   readonly #cartInstance: CartInstance = inject(CartInstance);
   readonly #ecommerceInstance: EcommerceService = inject(EcommerceService);
   readonly #confirmationService: ConfirmationService = inject(ConfirmationService);
+  readonly #hotToastInstance: HotToastClass = inject(HotToastClass);
 
   isLoading = false;
 
@@ -103,8 +105,8 @@ export class Cart implements OnInit {
 
   get canFinalize() {
     return (
-      this.#cartInstance.facturationDataIsValid &&
-      this.#cartInstance.shippingDataIsValid &&
+      this.#cartInstance.fgFacturation.valid &&
+      this.#cartInstance.fgShipping.valid &&
       !!this.transactionReference &&
       !!this.#cartInstance.transactionId
     );
@@ -139,7 +141,7 @@ export class Cart implements OnInit {
 
     this.#cartInstance.facturationData = results.facturationData;
     this.#cartInstance.shippingData = results.shippingData;
-    this.#cartInstance.shippingCost = results.shippingData.cost;
+    // this.#cartInstance.shippingCost = results.shippingData.cost;
   }
 
   async deleteProduct(uuid: string) {
@@ -183,6 +185,9 @@ export class Cart implements OnInit {
       }
       return;
     } else if (this.#cartInstance.fgFacturation.valid) {
+      this.#cartInstance.fcState.enable();
+      this.#cartInstance.fcFullName.enable();
+
       const {
         address,
         city,
@@ -195,6 +200,9 @@ export class Cart implements OnInit {
         secondName,
         lastName,
       } = this.#cartInstance.facturationData;
+      this.#cartInstance.fcState.disable();
+      this.#cartInstance.fcFullName.disable();
+
       if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
         try {
           this.isLoading = true;
@@ -268,7 +276,7 @@ export class Cart implements OnInit {
 
           if (!results) throw new Error('Results is void');
         } catch (error) {
-          console.error('[continue] postCreateClient - error', error);
+          console.error('[continue] putUpdateClient - error', error);
           return;
         } finally {
           this.isLoading = false;
@@ -344,10 +352,12 @@ export class Cart implements OnInit {
         await this.payWithWompi();
         return;
       } else {
+        this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
         this.#cartInstance.fgShipping.markAllAsDirty();
         this.#cartInstance.fgShipping.markAllAsTouched();
       }
     } else {
+      this.#hotToastInstance.infoNotification('Por favor completa los datos de facturación.');
       this.#cartInstance.fgFacturation.markAllAsDirty();
       this.#cartInstance.fgFacturation.markAllAsTouched();
     }
@@ -355,7 +365,9 @@ export class Cart implements OnInit {
 
   async payWithWompi() {
     if (!this.signatureIntegrity) await this.getSignatureIntegrity();
-
+    debugger;
+    this.#cartInstance.fcState.enable();
+    this.#cartInstance.fcFullName.enable();
     const checkout = new WidgetCheckout({
       currency: 'COP',
       amountInCents: this.cartTotalPriceInCents,
@@ -374,14 +386,9 @@ export class Cart implements OnInit {
         legalId: this.#cartInstance.facturationData.nationalId,
         legalIdType: 'CC',
       },
-      // shippingAddress: {
-      //   addressLine1: this.#cartInstance.shippingData.address,
-      //   city: this.#cartInstance.shippingData.city,
-      //   phoneNumber: this.#cartInstance.shippingData.phoneNumber,
-      //   region: this.#cartInstance.shippingData.state,
-      //   country: 'CO',
-      // },
     });
+    this.#cartInstance.fcState.disable();
+    this.#cartInstance.fcFullName.disable();
 
     checkout.open(async (result: any) => {
       await this.#cartInstance.deleteProducts(this.filteredProducts.map(({ uuid }) => uuid));

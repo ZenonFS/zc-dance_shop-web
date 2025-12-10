@@ -81,21 +81,12 @@ export class Cart {
     phoneNumber: new FormControl('', [Validators.required]),
   });
 
-  #shippingData: IShippingData = {
-    cost: 12000,
-    address: null,
-    state: null,
-    city: null,
-    phoneNumber: null,
-  };
   get shippingData() {
-    return this.#shippingData;
+    return this.fgShipping.value as IShippingData;
   }
   set shippingData(shippingData: IShippingData) {
     const { cost, ...rest } = shippingData;
     this.fgShipping.patchValue(rest, { emitEvent: false });
-
-    this.#shippingData = shippingData;
   }
   #shippingDataIsValid = false;
   get shippingDataIsValid() {
@@ -133,32 +124,19 @@ export class Cart {
     email: this.fcEmail,
   });
 
-  #facturationData: IFacturationData = {
-    nationalId: null,
-    fullName: null,
-    address: null,
-    state: null,
-    city: null,
-    phoneNumber: null,
-    email: null,
-  };
   get facturationData() {
-    return this.#facturationData;
+    return this.fgFacturation.value as IFacturationData;
   }
   set facturationData(facturationData: IFacturationData) {
     this.fgFacturation.patchValue(facturationData, { emitEvent: false });
+    this.fcCity.patchValue(facturationData['city'] ?? '');
     db.facturationData.upsert(<string>facturationData['nationalId'], facturationData);
-    this.#facturationData = facturationData;
   }
   get facturationDataFromDraft() {
     return this.facturationData$.getValue?.();
   }
-  #facturationDataIsValid = false;
   get facturationDataIsValid() {
-    return this.#facturationDataIsValid;
-  }
-  set facturationDataIsValid(isValid) {
-    this.#facturationDataIsValid = isValid;
+    return this.fgFacturation.valid;
   }
 
   #transactionId: string | null = null;
