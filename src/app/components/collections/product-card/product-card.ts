@@ -104,7 +104,7 @@ export class ProductCard implements IProduct {
   amount = 1;
 
   get btnLabel() {
-    return this.type === 'variantParent' ? 'Seleccionar variante' : 'Agregar al carrito';
+    return this.type === 'variantParent' ? 'Seleccionar opciones' : 'Agregar al carrito';
   }
 
   constructor(

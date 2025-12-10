@@ -125,9 +125,7 @@
         [label]="
           productIsInCart
             ? 'Producto en la bolsa'
-            : product.type === 'variantParent'
-            ? 'Seleccionar variante'
-            : 'Añadir a mi bolsa'
+            : 'Agregar la carrito'
         "
         [disabled]="productIsInCart"
         class="w-full"
