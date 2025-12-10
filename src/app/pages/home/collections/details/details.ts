@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { Toast } from 'primeng/toast';
 import { Carousel } from 'primeng/carousel';
@@ -41,7 +41,7 @@ import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
     InputNumber,
     ProgressSpinner,
   ],
-  providers: [],
+  providers: [MessageService],
   templateUrl: './details.html',
   styleUrl: './details.scss',
 })
