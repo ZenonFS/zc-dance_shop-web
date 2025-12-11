@@ -159,18 +159,6 @@
 #zc--carousel-img {
   height: 100%;
   width: 100%;
-
-  @media (width >= 48rem) {
-    height: 100%;
-  }
-
-  @media (width >= 64rem) {
-    height: 120%;
-  }
-
-  @media (width >= 80rem) {
-    height: 100vh;
-  }
 }
 
 video {
