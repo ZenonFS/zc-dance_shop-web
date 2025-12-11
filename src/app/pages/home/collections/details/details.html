@@ -153,7 +153,6 @@
   appendTo="body"
   [modal]="true"
   [(visible)]="visible"
-  [style]="{ width: '25rem' }"
 >
   <span class="p-text-secondary block mb-8"
     >Seleccione una variante del producto para agregarlo al carrito.</span
@@ -197,7 +196,7 @@
   appendTo="body"
   [modal]="true"
   [(visible)]="sizesGuideDialogIsVisible"
-  [style]="{ width: '80wh' }"
+  [style]="{ width: '90vw' }"
 >
   <p-tabs [value]="attachments[0]?.id ?? 0">
     <p-tablist>
@@ -208,7 +207,7 @@
     <p-tabpanels>
       @for (attachment of attachments; track attachment.id) {
       <p-tabpanel [value]="attachment.id">
-        <div class="w-[80vh]">
+        <div class="w-full">
           <img [src]="attachment.url" [alt]="attachment.name" class="w-full object-contain" />
         </div>
       </p-tabpanel>
