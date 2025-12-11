@@ -87,12 +87,19 @@ export interface IImage {
   favorite: boolean;
 }
 
+export interface IAttachment {
+  url: string;
+  id: number;
+  name: string;
+}
+
 export interface ICustomField {
   // Define según sea necesario si hay estructura
 }
 
 export interface IProduct {
   id: string;
+  attachments: IAttachment[];
   category: ICategory;
   hasNoIvaDays: boolean;
   itemCategory: IItemCategory;

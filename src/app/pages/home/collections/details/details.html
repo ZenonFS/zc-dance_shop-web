@@ -33,12 +33,24 @@
     </p-carousel>
   </div>
   <div class="details flex flex-col gap-4 lg:w-[50%]">
-    <div id="general">
+    <div id="general" class="flex">
       @if (product) {
-      <h3 class="text-2xl">{{ product.name }}</h3>
-      <span class="text-sm">{{ product.reference }}</span>
-      <h4 class="mt-2">{{ product.price[0].price | currency }}</h4>
-      } @else {
+      <div class="w-full">
+        <h3 class="text-2xl">{{ product.name }}</h3>
+        <span class="text-sm">{{ product.reference }}</span>
+        <h4 class="mt-2">{{ product.price[0].price | currency }}</h4>
+      </div>
+      @if(attachments.length > 0) {
+      <p-button
+        severity="secondary"
+        icon="pi pi-book"
+        iconPos="right"
+        label="Guía de tallas"
+        class="w-48"
+        (click)="sizesGuideDialogIsVisible = true"
+        (keydown)="sizesGuideDialogIsVisible = true"
+      />
+      } } @else {
       <p-skeleton class="mb-4"></p-skeleton>
       <p-skeleton class="mb-4"></p-skeleton>
       <p-skeleton class="mb-4"></p-skeleton>
@@ -122,11 +134,7 @@
 
       <p-button
         icon="pi pi-shopping-bag"
-        [label]="
-          productIsInCart
-            ? 'Producto en la bolsa'
-            : 'Agregar la carrito'
-        "
+        [label]="productIsInCart ? 'Producto en la bolsa' : 'Agregar la carrito'"
         [disabled]="productIsInCart"
         class="w-full"
         (click)="addProductToCart()"
@@ -139,7 +147,7 @@
   </div>
 </div>
 }
-
+<!-- Dialog: Variantes -->
 <p-dialog
   header="Selecciona una variante"
   appendTo="body"
@@ -182,4 +190,29 @@
     <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
     <p-button label="Confirmar" (click)="confirmAddToCart()" />
   </div>
+</p-dialog>
+<!-- Dialog: Guía de Tallas -->
+<p-dialog
+  header="Guía de Tallas"
+  appendTo="body"
+  [modal]="true"
+  [(visible)]="sizesGuideDialogIsVisible"
+  [style]="{ width: '80wh' }"
+>
+  <p-tabs [value]="attachments[0]?.id ?? 0">
+    <p-tablist>
+      @for (attachment of attachments; track attachment.id) {
+      <p-tab [value]="attachment.id">{{ attachment.name }}</p-tab>
+      }
+    </p-tablist>
+    <p-tabpanels>
+      @for (attachment of attachments; track attachment.id) {
+      <p-tabpanel [value]="attachment.id">
+        <div class="w-[80vh]">
+          <img [src]="attachment.url" [alt]="attachment.name" class="w-full object-contain" />
+        </div>
+      </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
 </p-dialog>

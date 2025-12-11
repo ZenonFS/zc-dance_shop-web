@@ -1,3 +1,4 @@
+import { IAttachment } from './../../../../../shared/interfaces/product-details.interfaces';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -21,6 +22,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
+import { TabsModule } from 'primeng/tabs';
 
 @Component({
   selector: 'app-details',
@@ -35,6 +37,7 @@ import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
     Button,
     Message,
     SelectButton,
+    TabsModule,
     Skeleton,
     Dialog,
     Listbox,
@@ -57,6 +60,7 @@ export class Details implements OnInit {
   home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
   images: IImage[] = [];
+  attachments: IAttachment[] = []
 
   responsiveOptions = [
     {
@@ -118,6 +122,8 @@ export class Details implements OnInit {
   visible: boolean = false;
   onChanging = false;
 
+  sizesGuideDialogIsVisible = false;
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly ecommerceInstance: EcommerceService,
@@ -178,6 +184,7 @@ export class Details implements OnInit {
         label: results['name'],
       });
       this.images = results['images'];
+      this.attachments = results['attachments'] ?? [];
       this.cd.detectChanges();
       this.cd.reattach();
 
