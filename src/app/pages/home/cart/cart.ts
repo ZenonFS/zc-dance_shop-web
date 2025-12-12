@@ -141,7 +141,6 @@ export class Cart implements OnInit {
 
     this.#cartInstance.facturationData = results.facturationData;
     this.#cartInstance.shippingData = results.shippingData;
-    // this.#cartInstance.shippingCost = results.shippingData.cost;
   }
 
   async deleteProduct(uuid: string) {
@@ -167,6 +166,121 @@ export class Cart implements OnInit {
     });
   }
 
+  async createClient() {
+    this.#cartInstance.fcState.enable();
+    this.#cartInstance.fcFullName.enable();
+
+    const {
+      address,
+      city,
+      email,
+      fullName,
+      nationalId,
+      phoneNumber,
+      state,
+      firstName,
+      secondName,
+      lastName,
+    } = this.#cartInstance.facturationData;
+
+    this.#cartInstance.fcState.disable();
+    this.#cartInstance.fcFullName.disable();
+    try {
+      this.isLoading = true;
+      const { results } = await this.#ecommerceInstance.postCreateClient({
+        kindOfPerson: 'PERSON_ENTITY',
+        identificationObject: {
+          type: 'CC',
+          number: nationalId ?? '',
+        },
+        mobile:
+          phoneNumber?.replace('(', '').replace(')', '').replace('-', '').replaceAll(' ', '') ?? '',
+        email: email ?? '',
+        address: {
+          address: address ?? '',
+          city: city ?? '',
+          country: 'Colombia',
+          department: state ?? '',
+        },
+        name: fullName ?? '',
+        nameObject: {
+          firstName: firstName ?? '',
+          secondName: secondName ?? '',
+          lastName: lastName ?? '',
+        },
+      } satisfies CreateContactDTO);
+
+      if (!results) throw new Error('Results is void');
+
+      this.#cartInstance.isNewClient = false;
+      this.#cartInstance.clientId = results['id'];
+    } catch (error) {
+      console.error('[continue] postCreateClient - error', error);
+      return;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async updateClient() {
+    this.#cartInstance.fcState.enable();
+    this.#cartInstance.fcFullName.enable();
+
+    const {
+      address,
+      city,
+      email,
+      fullName,
+      nationalId,
+      phoneNumber,
+      state,
+      firstName,
+      secondName,
+      lastName,
+    } = this.#cartInstance.facturationData;
+
+    this.#cartInstance.fcState.disable();
+    this.#cartInstance.fcFullName.disable();
+
+    try {
+      this.isLoading = true;
+
+      const { results } = await this.#ecommerceInstance.putUpdateClient(
+        <string>this.#cartInstance.clientId,
+        {
+          kindOfPerson: 'PERSON_ENTITY',
+          identificationObject: {
+            type: 'CC',
+            number: nationalId ?? '',
+          },
+          mobile:
+            phoneNumber?.replace('(', '').replace(')', '').replace('-', '').replaceAll(' ', '') ??
+            '',
+          email: email ?? '',
+          address: {
+            address: address ?? '',
+            city: city ?? '',
+            country: 'Colombia',
+            department: state ?? '',
+          },
+          name: fullName ?? '',
+          nameObject: {
+            firstName: firstName ?? '',
+            secondName: secondName ?? '',
+            lastName: lastName ?? '',
+          },
+        } satisfies UpdateContactDTO
+      );
+
+      if (!results) throw new Error('Results is void');
+    } catch (error) {
+      console.error('[continue] putUpdateClient - error', error);
+      return;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   async continue() {
     if (!this.transactionReference) {
       try {
@@ -184,188 +298,99 @@ export class Cart implements OnInit {
         this.isLoading = false;
       }
       return;
-    } else if (this.#cartInstance.fgFacturation.valid) {
-      this.#cartInstance.fcState.enable();
-      this.#cartInstance.fcFullName.enable();
+    } else if (!this.#cartInstance.transactionId && this.#cartInstance.fgShipping.valid) {
+      try {
+        this.isLoading = true;
+        this.#cartInstance.fcShippingState.enable();
+        this.#cartInstance.fcState.enable();
+        this.#cartInstance.fcFullName.enable();
 
-      const {
-        address,
-        city,
-        email,
-        fullName,
-        nationalId,
-        phoneNumber,
-        state,
-        firstName,
-        secondName,
-        lastName,
-      } = this.#cartInstance.facturationData;
-      this.#cartInstance.fcState.disable();
-      this.#cartInstance.fcFullName.disable();
+        const { results } = await this.#ecommerceInstance.postCreateTransaction({
+          products: this.filteredProducts,
+          reference: this.transactionReference,
+          facturationData: {
+            ...this.#cartInstance.facturationData,
+            id: this.#cartInstance.clientId ?? '',
+          },
+          shippingData: this.#cartInstance.shippingData,
+        });
 
-      if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
-        try {
-          this.isLoading = true;
-          const { results } = await this.#ecommerceInstance.postCreateClient({
-            kindOfPerson: 'PERSON_ENTITY',
-            identificationObject: {
-              type: 'CC',
-              number: nationalId ?? '',
-            },
-            mobile:
-              phoneNumber?.replace('(', '').replace(')', '').replace('-', '').replaceAll(' ', '') ??
-              '',
-            email: email ?? '',
-            address: {
-              address: address ?? '',
-              city: city ?? '',
-              country: 'Colombia',
-              department: state ?? '',
-            },
-            name: fullName ?? '',
-            nameObject: {
-              firstName: firstName ?? '',
-              secondName: secondName ?? '',
-              lastName: lastName ?? '',
-            },
-          } satisfies CreateContactDTO);
+        this.#cartInstance.fcShippingState.disable();
+        this.#cartInstance.fcState.disable();
+        this.#cartInstance.fcFullName.disable();
 
-          if (!results) throw new Error('Results is void');
+        if (!results) throw new Error('Results is void');
 
-          this.#cartInstance.isNewClient = false;
-          this.#cartInstance.clientId = results['id'];
-        } catch (error) {
-          console.error('[continue] postCreateClient - error', error);
-          return;
-        } finally {
-          this.isLoading = false;
-        }
-      else
-        try {
-          this.isLoading = true;
+        this.#cartInstance.transactionId = results['_id'];
+        this.#router.navigate([], {
+          queryParams: {
+            transactionReference: this.transactionReference,
+            transactionId: this.#cartInstance.transactionId,
+          },
+          relativeTo: this.#route,
+        });
+      } catch (error) {
+        console.error('[continue] postCreateTransaction - error', error);
+      } finally {
+        this.isLoading = false;
+      }
+    } else if (this.#cartInstance.transactionId) {
+      try {
+        this.isLoading = true;
+        await this.#ecommerceInstance.patchUpdateTransaction(this.#cartInstance.transactionId, {
+          products: this.filteredProducts,
+          reference: this.transactionReference,
+          facturationData: {
+            ...this.#cartInstance.facturationData,
+            id: this.#cartInstance.clientId ?? '',
+          },
+          shippingData: this.#cartInstance.shippingData,
+        });
 
-          const { results } = await this.#ecommerceInstance.putUpdateClient(
-            <string>this.#cartInstance.clientId,
-            {
-              kindOfPerson: 'PERSON_ENTITY',
-              identificationObject: {
-                type: 'CC',
-                number: nationalId ?? '',
-              },
-              mobile:
-                phoneNumber
-                  ?.replace('(', '')
-                  .replace(')', '')
-                  .replace('-', '')
-                  .replaceAll(' ', '') ?? '',
-              email: email ?? '',
-              address: {
-                address: address ?? '',
-                city: city ?? '',
-                country: 'Colombia',
-                department: state ?? '',
-              },
-              name: fullName ?? '',
-              nameObject: {
-                firstName: firstName ?? '',
-                secondName: secondName ?? '',
-                lastName: lastName ?? '',
-              },
-            } satisfies UpdateContactDTO
-          );
+        if (this.#cartInstance.fgFacturation.valid) {
+          if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
+            await this.createClient();
+          else await this.updateClient();
 
-          if (!results) throw new Error('Results is void');
-        } catch (error) {
-          console.error('[continue] putUpdateClient - error', error);
-          return;
-        } finally {
-          this.isLoading = false;
-        }
-
-      if (this.#cartInstance.fgFacturation.valid && this.#cartInstance.clientId)
-        if (!this.#cartInstance.transactionId)
-          try {
-            this.isLoading = true;
-            const { results } = await this.#ecommerceInstance.postCreateTransaction({
-              products: this.filteredProducts,
-              reference: this.transactionReference,
-              facturationData: {
-                ...this.#cartInstance.facturationData,
-                id: this.#cartInstance.clientId,
-              },
-              shippingData: this.#cartInstance.shippingData,
-            });
-
-            if (!results) throw new Error('Results is void');
-
-            this.#cartInstance.transactionId = results['_id'];
-            this.#router.navigate([], {
-              queryParams: {
-                transactionReference: this.transactionReference,
-                transactionId: this.#cartInstance.transactionId,
-              },
-              relativeTo: this.#route,
-            });
-          } catch (error) {
-            console.error('[continue] postCreateTransaction - error', error);
-          } finally {
-            this.isLoading = false;
-          }
-        else if (this.#cartInstance.transactionId) {
-          try {
-            this.isLoading = true;
-            const { results } = await this.#ecommerceInstance.patchUpdateTransaction(
-              this.#cartInstance.transactionId,
-              {
-                products: this.filteredProducts,
-                reference: this.transactionReference,
-                facturationData: {
-                  ...this.#cartInstance.facturationData,
-                  id: this.#cartInstance.clientId,
-                },
-                shippingData: this.#cartInstance.shippingData,
-              }
-            );
-
-            if (!results) throw new Error('Results is void');
-
-            this.#cartInstance.transactionId = results['_id'];
-            this.#router.navigate([], {
-              queryParams: {
-                transactionReference: this.transactionReference,
-                transactionId: this.#cartInstance.transactionId,
-              },
-              relativeTo: this.#route,
-            });
-          } catch (error) {
-            console.error('[continue] patchUpdateTransaction - error', error);
-          } finally {
-            this.isLoading = false;
-          }
+          if (this.#cartInstance.clientId)
+            if (this.canFinalize) {
+              await this.payWithWompi();
+              return;
+            } else {
+              this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
+              this.#cartInstance.fgShipping.markAllAsDirty();
+              this.#cartInstance.fgShipping.markAllAsTouched();
+              return;
+            }
         } else {
+          this.#hotToastInstance.infoNotification('Por favor completa los datos de facturación.');
           this.#cartInstance.fgFacturation.markAllAsDirty();
           this.#cartInstance.fgFacturation.markAllAsTouched();
           return;
         }
 
-      if (this.canFinalize) {
-        await this.payWithWompi();
-        return;
-      } else {
-        this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
-        this.#cartInstance.fgShipping.markAllAsDirty();
-        this.#cartInstance.fgShipping.markAllAsTouched();
+        this.#router.navigate([], {
+          queryParams: {
+            transactionReference: this.transactionReference,
+            transactionId: this.#cartInstance.transactionId,
+          },
+          relativeTo: this.#route,
+        });
+      } catch (error) {
+        console.error('[continue] patchUpdateTransaction - error', error);
+      } finally {
+        this.isLoading = false;
       }
     } else {
-      this.#hotToastInstance.infoNotification('Por favor completa los datos de facturación.');
-      this.#cartInstance.fgFacturation.markAllAsDirty();
-      this.#cartInstance.fgFacturation.markAllAsTouched();
+      this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
+      this.#cartInstance.fgShipping.markAllAsDirty();
+      this.#cartInstance.fgShipping.markAllAsTouched();
+      return;
     }
   }
 
   async payWithWompi() {
     if (!this.signatureIntegrity) await this.getSignatureIntegrity();
-    debugger;
     this.#cartInstance.fcState.enable();
     this.#cartInstance.fcFullName.enable();
     const checkout = new WidgetCheckout({
@@ -394,7 +419,6 @@ export class Cart implements OnInit {
       await this.#cartInstance.deleteProducts(this.filteredProducts.map(({ uuid }) => uuid));
 
       const transaction = result.transaction;
-      console.log('Transaction object: ', transaction);
 
       this.#router.navigate(['/check'], {
         queryParams: {

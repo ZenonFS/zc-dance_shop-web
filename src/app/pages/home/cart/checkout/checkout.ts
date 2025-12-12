@@ -65,7 +65,7 @@ export class Checkout implements OnInit {
     { label: 'Persona jurídica', value: 'LEGAL_ENTITY' },
   ];
 
-  useFacturactionAdressDataOptions = [
+  yesOrNotOptions = [
     { label: 'Sí', value: true },
     { label: 'No', value: false },
   ];
@@ -101,8 +101,8 @@ export class Checkout implements OnInit {
     return this.cartInstance.fcEmail.value;
   }
 
-  get useFacturactionAdressData() {
-    return this.cartInstance.fcUseFacturactionAdressData.value;
+  get useShippingData() {
+    return this.cartInstance.fcUseShippingData.value;
   }
 
   get cartTotalPriceInCents() {
@@ -232,17 +232,17 @@ export class Checkout implements OnInit {
           }
         }
       });
-    this.cartInstance.fcUseFacturactionAdressData.valueChanges.subscribe((value) => {
+    this.cartInstance.fcUseShippingData.valueChanges.subscribe((value) => {
       if (value) {
-        const { address, city, phoneNumber, state } = this.cartInstance.fgFacturation.controls;
-        this.cartInstance.fgShipping.patchValue({
+        const { address, city, phoneNumber, state } = this.cartInstance.fgShipping.controls;
+        this.cartInstance.fgFacturation.patchValue({
           phoneNumber: phoneNumber.value,
           address: address.value,
           city: city.value,
           state: state.value,
         });
       } else {
-        this.cartInstance.fgShipping.patchValue({
+        this.cartInstance.fgFacturation.patchValue({
           phoneNumber: null,
           address: null,
           city: null,
@@ -255,10 +255,13 @@ export class Checkout implements OnInit {
       if (!value) return;
 
       const cityMetadata = this.#cities.get(value);
-      if (!cityMetadata) return;
+      if (!cityMetadata || !cityMetadata.state) return;
 
       if (cityMetadata.postalCode === 'domicilio') this.cartInstance.shippingCost = 12000;
       if (cityMetadata.postalCode === 'interrapidisimo') this.cartInstance.shippingCost = 18000;
+
+      this.cartInstance.fcShippingState.patchValue(cityMetadata.state.split('-').pop()?.trim() ?? '');
+
     });
   }
 
@@ -271,11 +274,7 @@ export class Checkout implements OnInit {
 
       if (!cityMetadata || !cityMetadata.state) return;
 
-      this.cartInstance.fcState.enable();
       this.cartInstance.fcState.patchValue(cityMetadata.state.split('-').pop()?.trim() ?? '');
-      this.cartInstance.fcState.disable();
-
-      // this.cartInstance.fgFacturation.patchValue({ state: cityMetadata.state.split('-').pop()?.trim() ?? '' });
     });
 
     const { results } = await this.#geolocationApiInstance.getCities();

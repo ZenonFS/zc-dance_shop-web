@@ -69,12 +69,10 @@ export class Cart {
     return this.cart.products;
   }
 
-  fcUseFacturactionAdressData = new FormControl(false, [Validators.required]);
   fcShippingState = new FormControl('', [Validators.required]);
   fcShippingCity = new FormControl('', [Validators.required]);
 
   fgShipping = new FormGroup({
-    useFacturactionAdressData: this.fcUseFacturactionAdressData,
     address: new FormControl('', [Validators.required]),
     city: this.fcShippingCity,
     state: this.fcShippingState,
@@ -104,13 +102,15 @@ export class Cart {
   fcFirstName = new FormControl('', [Validators.required]);
   fcSecondName = new FormControl('');
   fcLastName = new FormControl('', [Validators.required]);
-  fcAddress = new FormControl('');
-  fcState = new FormControl('');
-  fcCity = new FormControl('');
+  fcAddress = new FormControl('', [Validators.required]);
+  fcState = new FormControl('', [Validators.required]);
+  fcCity = new FormControl('', [Validators.required]);
   fcPhoneNumber = new FormControl('', [Validators.required]);
   fcEmail = new FormControl('', [Validators.required]);
+  fcUseShippingData = new FormControl(false, [Validators.required]);
 
   fgFacturation = new FormGroup({
+    useShippingData: this.fcUseShippingData,
     kindOfPerson: this.fcKindOfPerson,
     nationalId: this.fcNationalId,
     fullName: this.fcFullName,

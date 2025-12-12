@@ -1,5 +1,48 @@
 <p-card class="my-4">
   <ng-template #title>
+    <span>Envío</span>
+    <p-divider />
+  </ng-template>
+  <form [formGroup]="fgShipping" class="flex flex-col gap-8">
+    <p-floatlabel>
+      <p-inputmask
+        mask="(999) 999-9999"
+        formControlName="phoneNumber"
+        id="secondLastName"
+        class="w-full"
+      />
+      <label for="phoneNumber">Celular de quien recibe</label>
+    </p-floatlabel>
+    <p-inputgroup>
+      <p-floatlabel>
+        <input pInputText readonly formControlName="state" id="state" name="state" class="w-full" />
+        <label for="state">Departamento</label>
+      </p-floatlabel>
+
+      <p-floatlabel>
+        <p-autocomplete
+          formControlName="city"
+          id="city"
+          name="city"
+          [suggestions]="optionsCities"
+          (completeMethod)="filterCountry($event)"
+          [dropdown]="true"
+          dropdownAriaLabel="Desplegable de ciudades"
+          optionLabel="name"
+          optionValue="name"
+        />
+        <label for="state">Ciudad</label>
+      </p-floatlabel>
+    </p-inputgroup>
+    <p-floatlabel>
+      <input pInputText id="address" name="address" formControlName="address" class="w-full" />
+      <label for="address">Dirección de facturación</label>
+    </p-floatlabel>
+  </form>
+</p-card>
+@if (cartInstance.transactionId) {
+<p-card class="my-4">
+  <ng-template #title>
     <span>Datos de Facturación</span>
     <p-divider />
   </ng-template>
@@ -55,6 +98,27 @@
       <input pInputText formControlName="lastName" id="lastName" name="lastName" class="w-full" />
       <label for="lastName">Apellidos</label>
     </p-floatlabel>
+    <p-floatlabel>
+      <input pInputText formControlName="email" id="email" name="email" class="w-full" />
+      <label for="email">Correo Electrónico</label>
+    </p-floatlabel>
+
+    <p-divider />
+
+    <div class="flex flex-col items-center">
+      <label for="area-metropolitana" class="ml-2"
+        >¿Desea utilizar la misma dirección de envío?</label
+      >
+      <p-selectbutton
+        [options]="yesOrNotOptions"
+        formControlName="useShippingData"
+        optionLabel="label"
+        optionValue="value"
+        aria-labelledby="basic"
+      />
+    </div>
+
+    <p-divider />
 
     <p-floatlabel>
       <p-inputmask
@@ -64,10 +128,6 @@
         class="w-full"
       />
       <label for="phoneNumber">Número de Celular</label>
-    </p-floatlabel>
-    <p-floatlabel>
-      <input pInputText formControlName="email" id="email" name="email" class="w-full" />
-      <label for="email">Correo Electrónico</label>
     </p-floatlabel>
     <p-inputgroup>
       <p-floatlabel>
@@ -95,66 +155,6 @@
       <label for="address">Dirección de facturación</label>
     </p-floatlabel>
     }
-  </form>
-</p-card>
-@if (cartInstance.transactionId) {
-
-<p-card class="my-4">
-  <ng-template #title>
-    <span>Envío</span>
-    <p-divider />
-  </ng-template>
-  <form [formGroup]="fgShipping" class="flex flex-col gap-8">
-    <div class="flex flex-col items-center">
-      <label for="area-metropolitana" class="ml-2"
-        >¿Desea utilizar la misma dirección de la facturación?</label
-      >
-      <p-selectbutton
-        [options]="useFacturactionAdressDataOptions"
-        formControlName="useFacturactionAdressData"
-        optionLabel="label"
-        optionValue="value"
-        aria-labelledby="basic"
-        [invalid]="fgFacturation.invalid"
-        />
-    </div>
-
-    <p-divider />
-
-    <p-floatlabel>
-      <p-inputmask
-        mask="(999) 999-9999"
-        formControlName="phoneNumber"
-        id="secondLastName"
-        class="w-full"
-      />
-      <label for="phoneNumber">Celular de quien recibe</label>
-    </p-floatlabel>
-    <p-inputgroup>
-      <p-floatlabel>
-        <input pInputText readonly formControlName="state" id="state" name="state" class="w-full" />
-        <label for="state">Departamento</label>
-      </p-floatlabel>
-
-      <p-floatlabel>
-        <p-autocomplete
-          formControlName="city"
-          id="city"
-          name="city"
-          [suggestions]="optionsCities"
-          (completeMethod)="filterCountry($event)"
-          [dropdown]="true"
-          dropdownAriaLabel="Desplegable de ciudades"
-          optionLabel="name"
-          optionValue="name"
-        />
-        <label for="state">Ciudad</label>
-      </p-floatlabel>
-    </p-inputgroup>
-    <p-floatlabel>
-      <input pInputText id="address" name="address" formControlName="address" class="w-full" />
-      <label for="address">Dirección de facturación</label>
-    </p-floatlabel>
   </form>
 </p-card>
 }
