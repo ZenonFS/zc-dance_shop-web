@@ -11,6 +11,6 @@ export const environment = {
 
   wompi: {
     publicKey: 'pub_test_dh8B4Jc20RO5iNnEk42kSgF0APJcA1ia',
-    integrity: 'test_integrity_JRFc1P3x77NV1t6X9DRGvCovxYtUlq5u',
+    integrity: 'test_integrity_i3g4jEk6PtCqQBCkEDGh7nGGw2043JLm',
   },
 };
