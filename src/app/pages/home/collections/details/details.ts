@@ -60,7 +60,7 @@ export class Details implements OnInit {
   home: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
 
   images: IImage[] = [];
-  attachments: IAttachment[] = []
+  attachment!: IAttachment;
 
   responsiveOptions = [
     {
@@ -184,7 +184,7 @@ export class Details implements OnInit {
         label: results['name'],
       });
       this.images = results['images'];
-      this.attachments = results['attachments'] ?? [];
+      if (results['attachments']) this.attachment = results['attachments'][0];
       this.cd.detectChanges();
       this.cd.reattach();
 

@@ -40,7 +40,7 @@
         <span class="text-sm">{{ product.reference }}</span>
         <h4 class="mt-2">{{ product.price[0].price | currency }}</h4>
       </div>
-      @if(attachments.length > 0) {
+      @if(attachment) {
       <p-button
         severity="secondary"
         icon="pi pi-book"
@@ -148,12 +148,7 @@
 </div>
 }
 <!-- Dialog: Variantes -->
-<p-dialog
-  header="Selecciona una variante"
-  appendTo="body"
-  [modal]="true"
-  [(visible)]="visible"
->
+<p-dialog header="Selecciona una variante" appendTo="body" [modal]="true" [(visible)]="visible">
   <span class="p-text-secondary block mb-8"
     >Seleccione una variante del producto para agregarlo al carrito.</span
   >
@@ -198,20 +193,7 @@
   [(visible)]="sizesGuideDialogIsVisible"
   [style]="{ width: '90vw' }"
 >
-  <p-tabs [value]="attachments[0]?.id ?? 0">
-    <p-tablist>
-      @for (attachment of attachments; track attachment.id) {
-      <p-tab [value]="attachment.id">{{ attachment.name }}</p-tab>
-      }
-    </p-tablist>
-    <p-tabpanels>
-      @for (attachment of attachments; track attachment.id) {
-      <p-tabpanel [value]="attachment.id">
-        <div class="w-full">
-          <img [src]="attachment.url" [alt]="attachment.name" class="w-full object-contain" />
-        </div>
-      </p-tabpanel>
-      }
-    </p-tabpanels>
-  </p-tabs>
+  <div class="w-full">
+    <img [src]="attachment.url" [alt]="attachment.name" class="w-full object-contain" />
+  </div>
 </p-dialog>
