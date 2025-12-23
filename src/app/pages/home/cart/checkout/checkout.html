@@ -1,28 +1,105 @@
-<p-card class="my-4">
+<p-card class="my-4" id="form-contact">
+  <ng-template #title>
+    <span>Contacto</span>
+    <p-divider />
+  </ng-template>
+  <p-floatlabel>
+    <input pInputText [formControl]="fcEmail" id="email" name="email" class="w-full" />
+    <label for="email">Correo Electrónico</label>
+  </p-floatlabel>
+</p-card>
+
+<p-card class="my-4" id="form-shipping">
   <ng-template #title>
     <span>Envío</span>
     <p-divider />
   </ng-template>
   <form [formGroup]="fgShipping" class="flex flex-col gap-8">
+    <p-selectbutton
+      [options]="kindOfPersonOptions"
+      formControlName="kindOfPerson"
+      optionLabel="label"
+      optionValue="value"
+      aria-labelledby="basic"
+      [invalid]="kindOfPerson === null"
+    />
+    <p-floatlabel>
+      <p-inputmask
+        [mask]="nationalIdInputMask"
+        formControlName="nationalId"
+        id="shippingNationalId"
+        name="nationalId"
+        styleClass="w-full"
+      />
+      <label for="nationalId">Documento de Identidad</label>
+    </p-floatlabel>
+    <p-floatlabel>
+      <input
+        pInputText
+        formControlName="fullName"
+        id="shippingFullName"
+        name="fullName"
+        class="w-full"
+        readonly
+      />
+      <label for="fullName">Nombre Completo</label>
+    </p-floatlabel>
+
+    <p-inputgroup>
+      <p-floatlabel>
+        <input
+          pInputText
+          formControlName="firstName"
+          id="firstName"
+          name="firstName"
+          class="w-full"
+        />
+        <label for="firstName">Primer Nombre</label>
+      </p-floatlabel>
+      <p-floatlabel>
+        <input
+          pInputText
+          formControlName="secondName"
+          id="secondName"
+          name="secondName"
+          class="w-full"
+        />
+        <label for="secondName">Segundo Nombre</label>
+      </p-floatlabel>
+    </p-inputgroup>
+
+    <p-floatlabel>
+      <input pInputText formControlName="lastName" id="lastName" name="lastName" class="w-full" />
+      <label for="lastName">Apellidos</label>
+    </p-floatlabel>
+    <p-divider />
     <p-floatlabel>
       <p-inputmask
         mask="(999) 999-9999"
         formControlName="phoneNumber"
-        id="secondLastName"
+        id="shippingSecondLastName"
         class="w-full"
       />
       <label for="phoneNumber">Celular de quien recibe</label>
     </p-floatlabel>
     <p-inputgroup>
       <p-floatlabel>
-        <input pInputText readonly formControlName="state" id="state" name="state" class="w-full" />
+        <input
+          pInputText
+          readonly
+          formControlName="state"
+          id="shippingState"
+          name="state"
+          class="w-full"
+          readOnly
+        />
         <label for="state">Departamento</label>
       </p-floatlabel>
 
       <p-floatlabel>
         <p-autocomplete
           formControlName="city"
-          id="city"
+          id="shippingCity"
           name="city"
           [suggestions]="optionsCities"
           (completeMethod)="filterCountry($event)"
@@ -41,7 +118,7 @@
   </form>
 </p-card>
 @if (cartInstance.transactionId) {
-<p-card class="my-4">
+<p-card class="my-4" id="form-facturaction">
   <ng-template #title>
     <span>Datos de Facturación</span>
     <p-divider />
@@ -65,7 +142,6 @@
       />
       <label for="nationalId">Documento de Identidad</label>
     </p-floatlabel>
-    @if (nationalId !== '') {
     <p-floatlabel>
       <input pInputText formControlName="fullName" id="fullName" name="fullName" class="w-full" />
       <label for="fullName">Nombre Completo</label>
@@ -90,7 +166,7 @@
           name="secondName"
           class="w-full"
         />
-        <label for="secondName">Sengundo Nombre</label>
+        <label for="secondName">Segundo Nombre</label>
       </p-floatlabel>
     </p-inputgroup>
 
@@ -98,27 +174,6 @@
       <input pInputText formControlName="lastName" id="lastName" name="lastName" class="w-full" />
       <label for="lastName">Apellidos</label>
     </p-floatlabel>
-    <p-floatlabel>
-      <input pInputText formControlName="email" id="email" name="email" class="w-full" />
-      <label for="email">Correo Electrónico</label>
-    </p-floatlabel>
-
-    <p-divider />
-
-    <div class="flex flex-col items-center">
-      <label for="area-metropolitana" class="ml-2"
-        >¿Desea utilizar la misma dirección de envío?</label
-      >
-      <p-selectbutton
-        [options]="yesOrNotOptions"
-        formControlName="useShippingData"
-        optionLabel="label"
-        optionValue="value"
-        aria-labelledby="basic"
-      />
-    </div>
-
-    <p-divider />
 
     <p-floatlabel>
       <p-inputmask
@@ -131,7 +186,15 @@
     </p-floatlabel>
     <p-inputgroup>
       <p-floatlabel>
-        <input pInputText readonly formControlName="state" id="state" name="state" class="w-full" />
+        <input
+          pInputText
+          readonly
+          formControlName="state"
+          id="state"
+          name="state"
+          class="w-full"
+          readOnly
+        />
         <label for="state">Departamento</label>
       </p-floatlabel>
 
@@ -154,7 +217,6 @@
       <input pInputText id="address" name="address" formControlName="address" class="w-full" />
       <label for="address">Dirección de facturación</label>
     </p-floatlabel>
-    }
   </form>
 </p-card>
 }

@@ -1,4 +1,4 @@
-<p-confirmpopup />
+<p-confirmdialog />
 <section class="w-full md:w-[50%] lg:w-[70%]">
   <p-card>
     <ng-template #title>
@@ -98,7 +98,7 @@
     <p-button
       [label]="canFinalize ? 'Finalizar compra' : 'Continuar compra'"
       styleClass="w-full"
-      (onClick)="continue()"
+      (onClick)="continue($event)"
       [loading]="isLoading"
     />
   </ng-template>

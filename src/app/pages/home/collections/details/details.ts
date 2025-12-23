@@ -101,6 +101,9 @@ export class Details implements OnInit {
   get colors() {
     return this.#colorsOptions;
   }
+  get hasColors() {
+    return this.#colorsOptions.some((option) => !option.isDisabled);
+  }
 
   #sizesOptions: IOptions[] = [];
   get sizes() {
@@ -222,7 +225,46 @@ export class Details implements OnInit {
 
   async addProductToCart() {
     if (this._product.type === 'variantParent') {
-      this.showDialog();
+
+      if (this.sizeSelectRef.value && this.colorSelectRef.value && this.hasColors) {
+        const variant = this._product.variants.find(({ name }) =>
+          name.includes(`/ ${this.sizeSelectRef.value} / ${this.colorSelectRef.value}`)
+        );
+        if (!variant) return;
+        const productCart = {
+          uuid: variant.id,
+          name: variant.name,
+          reference: variant.reference,
+          type: variant.type,
+          price: variant.price[0].price,
+          imagesUrl: variant.images,
+          quantityAvalible: variant.inventory.availableQuantity,
+          amount: this.amount,
+          isSelected: true,
+          description: variant.description,
+        } satisfies IProductCart;
+
+        this.#addProduct(productCart);
+      } else if (this.sizeSelectRef.value && !this.colorSelectRef.value && !this.hasColors) {
+        const variant = this._product.variants.find(({ name }) =>
+          name.includes(`/ ${this.sizeSelectRef.value}`)
+        );
+        if (!variant) return;
+        const productCart = {
+          uuid: variant.id,
+          name: variant.name,
+          reference: variant.reference,
+          type: variant.type,
+          price: variant.price[0].price,
+          imagesUrl: variant.images,
+          quantityAvalible: variant.inventory.availableQuantity,
+          amount: this.amount,
+          isSelected: true,
+          description: variant.description,
+        } satisfies IProductCart;
+
+        this.#addProduct(productCart);
+      } else this.showDialog();
       return;
     }
 

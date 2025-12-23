@@ -20,10 +20,10 @@
       <b>Documento de identidad: </b> {{ transactionData.facturationData['nationalId'] }}
     </p>
     <p class="m-0"><b>Correo electrónico: </b> {{ transactionData.facturationData['email'] }}</p>
-    <p class="m-0"><b>Teléfono: </b> {{ transactionData.facturationData['phoneNumber'] }}</p>
-    <p class="m-0"><b>Dirección: </b> {{ transactionData.facturationData['address'] }}</p>
+    <p class="m-0"><b>Celular: </b> {{ transactionData.facturationData['phoneNumber'] }}</p>
     <p class="m-0"><b>Departamento: </b> {{ transactionData.facturationData['state'] }}</p>
     <p class="m-0"><b>Ciudad: </b> {{ transactionData.facturationData['city'] }}</p>
+    <p class="m-0"><b>Dirección: </b> {{ transactionData.facturationData['address'] }}</p>
     } @else {
     <p-skeleton class="h-40"></p-skeleton>
     }
@@ -34,11 +34,20 @@
       <h3 class="ml-5 pt-6 text-xl text-primary">Datos de Envío</h3>
     </ng-template>
     @if(transactionData && transactionData.shippingData.address !== null) {
-    <p class="m-0"><b>Valor de Envío: </b> {{ transactionData.shippingData.cost | currency }}</p>
-    <p class="m-0"><b>Teléfono de contacto: </b> {{ transactionData.shippingData.phoneNumber }}</p>
-    <p class="m-0"><b>Dirección que recibe: </b> {{ transactionData.shippingData.address }}</p>
+    <p class="m-0">
+      <b>Nombre completo de quien recibe: </b> {{ transactionData.shippingData['fullName'] }}
+    </p>
+    <p class="m-0">
+      <b>Documento de identidad de quien recibe: </b>
+      {{ transactionData.shippingData['nationalId'] }}
+    </p>
+    <p class="m-0">
+      <b>Celular de quien recibe: </b> {{ transactionData.shippingData.phoneNumber }}
+    </p>
     <p class="m-0"><b>Departamento destino: </b> {{ transactionData.shippingData.state }}</p>
     <p class="m-0"><b>Ciudad destino: </b> {{ transactionData.shippingData.city }}</p>
+    <p class="m-0"><b>Dirección destino: </b> {{ transactionData.shippingData.address }}</p>
+    <p class="m-0"><b>Valor de Envío: </b> {{ transactionData.shippingData.cost | currency }}</p>
     } @else {
     <p-skeleton class="h-40"></p-skeleton>
     }
@@ -82,6 +91,25 @@
     }
   </p-card>
   <ng-template #footer>
+    <p-card>
+      <ng-template #header>
+        <h6 class="ml-5 pt-6 text-sm text-primary">Política de cambios y devoluciones</h6>
+      </ng-template>
+
+      <ul class="text-sm list-disc list-inside">
+        <li>Cuando recibas tu paquete confirma que sea el producto y la cantidad solicitada</li>
+        <li>
+          Comprueba que el/los productos se encuentren en buen estado, ya que la solicitud de cambio
+          por mal estado del mismo debe presentarse en un periodo máximo de 24 horas, estas inician
+          en el momento en el que sea entregada tu compra. Es necesario tener evidencias para
+          realizar el cambio
+        </li>
+        <li>
+          Si estás inseguro(a) sobre color y/o talla solicita nuestra asesoría, ya que por estas
+          razones no se realizan cambios. Las medias son prendas íntimas ¡queremos cuidarte!
+        </li>
+      </ul>
+    </p-card>
     <p-card>
       <ng-template #header>
         <h6 class="ml-5 pt-6 text-sm text-primary">Tiempo de entrega</h6>

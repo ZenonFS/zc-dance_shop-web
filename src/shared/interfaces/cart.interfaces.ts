@@ -21,6 +21,13 @@ export interface IFacturationData {
 
 export interface IShippingData {
   cost: number;
+
+  nationalId?: string | null;
+  fullName?: string | null;
+  firstName?: string | null;
+  secondName?: string | null;
+  lastName?: string | null;
+
   address?: string | null;
   state?: string | null;
   city?: string | null;

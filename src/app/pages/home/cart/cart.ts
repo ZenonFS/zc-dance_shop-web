@@ -18,6 +18,7 @@ import { CreateContactDTO, UpdateContactDTO } from '@/shared/interfaces/clients.
 import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
 import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-cart',
@@ -36,6 +37,7 @@ import HotToastClass from '@/shared/utils/helpers/hot-toast.helper';
     Popover,
     Tooltip,
     RouterLink,
+    ConfirmDialog,
   ],
   providers: [ConfirmationService, CurrencyPipe],
   templateUrl: './cart.html',
@@ -64,10 +66,6 @@ export class Cart implements OnInit {
     return this.#expirationTime;
   }
 
-  get shippingCost() {
-    return this.#cartInstance.shippingCost;
-  }
-
   get shippingCostToString() {
     return this.#cartInstance.cartTotalPrice > 400000
       ? 'Gratis'
@@ -79,7 +77,7 @@ export class Cart implements OnInit {
 
   get cartTotal() {
     return this.#cartInstance.cartTotalPrice <= 400000
-      ? this.#cartInstance.cartTotalPrice + this.shippingCost
+      ? this.#cartInstance.cartTotalPrice + this.#cartInstance.shippingCost
       : this.#cartInstance.cartTotalPrice;
   }
 
@@ -107,6 +105,7 @@ export class Cart implements OnInit {
     return (
       this.#cartInstance.fgFacturation.valid &&
       this.#cartInstance.fgShipping.valid &&
+      this.#cartInstance.fcEmail.valid &&
       !!this.transactionReference &&
       !!this.#cartInstance.transactionId
     );
@@ -150,15 +149,16 @@ export class Cart implements OnInit {
   confirm(event: Event, product: IProductCart) {
     this.#confirmationService.confirm({
       target: event.currentTarget as EventTarget,
+      header: 'Confirmar Eliminación',
       message: '¿Estás seguro de querer eliminar el producto?',
       icon: 'pi pi-exclamation-triangle',
       rejectButtonProps: {
-        label: 'Cancel',
+        label: 'Cancelar',
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Save',
+        label: 'Eliminar',
       },
       accept: () => {
         this.deleteProduct(product.uuid);
@@ -281,7 +281,117 @@ export class Cart implements OnInit {
     }
   }
 
-  async continue() {
+  async createTransaction() {
+    try {
+      this.isLoading = true;
+      this.#cartInstance.fcShippingState.enable();
+      this.#cartInstance.fcState.enable();
+      this.#cartInstance.fcShippingFullName.enable();
+      this.#cartInstance.fcFullName.enable();
+
+      const { results } = await this.#ecommerceInstance.postCreateTransaction({
+        products: this.filteredProducts,
+        reference: this.transactionReference,
+        facturationData: {
+          ...this.#cartInstance.facturationData,
+          id: this.#cartInstance.clientId ?? '',
+        },
+        shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
+      });
+
+      this.#cartInstance.fcShippingState.disable();
+      this.#cartInstance.fcState.disable();
+      this.#cartInstance.fcShippingFullName.disable();
+      this.#cartInstance.fcFullName.disable();
+
+      if (!results) throw new Error('Results is void');
+
+      this.#cartInstance.transactionId = results['_id'];
+      this.#router.navigate([], {
+        queryParams: {
+          transactionReference: this.transactionReference,
+          transactionId: this.#cartInstance.transactionId,
+        },
+        fragment: 'target-section',
+        relativeTo: this.#route,
+      });
+
+      return results['_id'];
+    } catch (error) {
+      console.error('[continue] postCreateTransaction - error', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async continueToLastStep(transactionId: string) {
+    try {
+      this.isLoading = true;
+
+      this.#cartInstance.fcShippingState.enable();
+      this.#cartInstance.fcState.enable();
+      this.#cartInstance.fcShippingFullName.enable();
+      this.#cartInstance.fcFullName.enable();
+
+      await this.#ecommerceInstance.patchUpdateTransaction(transactionId, {
+        products: this.filteredProducts,
+        reference: this.transactionReference,
+        facturationData: {
+          ...this.#cartInstance.facturationData,
+          id: this.#cartInstance.clientId ?? '',
+        },
+        shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
+      });
+
+      this.#cartInstance.fcShippingState.disable();
+      this.#cartInstance.fcState.disable();
+      this.#cartInstance.fcShippingFullName.disable();
+      this.#cartInstance.fcFullName.disable();
+
+      if (this.#cartInstance.fgFacturation.valid) {
+        if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
+          await this.createClient();
+        else await this.updateClient();
+
+        if (this.#cartInstance.clientId)
+          if (this.canFinalize) {
+            await this.payWithWompi();
+            return;
+          } else {
+            if (this.#cartInstance.fgShipping.invalid) {
+              this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
+              this.#cartInstance.fgShipping.markAllAsDirty();
+              this.#cartInstance.fgShipping.markAllAsTouched();
+            }
+            if (this.#cartInstance.fcEmail.invalid) {
+              this.#hotToastInstance.infoNotification('Por favor completa los datos de contacto.');
+              this.#cartInstance.fcEmail.markAllAsDirty();
+              this.#cartInstance.fcEmail.markAllAsTouched();
+            }
+            return;
+          }
+      } else {
+        this.#hotToastInstance.infoNotification('Por favor completa los datos de facturación.');
+        this.#cartInstance.fgFacturation.markAllAsDirty();
+        this.#cartInstance.fgFacturation.markAllAsTouched();
+        return;
+      }
+
+      this.#router.navigate([], {
+        queryParams: {
+          transactionReference: this.transactionReference,
+          transactionId: this.#cartInstance.transactionId,
+        },
+        relativeTo: this.#route,
+      });
+    } catch (error) {
+      console.error('[continue] patchUpdateTransaction - error', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async continue($event: Event) {
     if (!this.transactionReference) {
       try {
         this.isLoading = true;
@@ -290,6 +400,7 @@ export class Cart implements OnInit {
           this.transactionReference = results;
           this.#router.navigate(['/cart/checkout'], {
             queryParams: { transactionReference: results },
+            fragment: 'form-contact',
           });
         }
       } catch (error) {
@@ -298,93 +409,66 @@ export class Cart implements OnInit {
         this.isLoading = false;
       }
       return;
-    } else if (!this.#cartInstance.transactionId && this.#cartInstance.fgShipping.valid) {
-      try {
-        this.isLoading = true;
-        this.#cartInstance.fcShippingState.enable();
-        this.#cartInstance.fcState.enable();
-        this.#cartInstance.fcFullName.enable();
+    } else if (
+      !this.#cartInstance.transactionId &&
+      this.#cartInstance.fgShipping.valid &&
+      this.#cartInstance.fcEmail.valid
+    ) {
+      this.#confirmationService.confirm({
+        target: $event.target as EventTarget,
+        message: '¿Desea usar la misma información de envío para la facturación?',
+        header: 'Datos de Facturación',
+        closable: true,
+        closeOnEscape: true,
+        icon: 'pi pi-exclamation-triangle',
+        rejectButtonProps: {
+          label: 'No',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptButtonProps: {
+          label: 'Sí',
+        },
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
+        accept: async () => {
+          this.#cartInstance.fcUseShippingData.patchValue(true);
+          this.#cartInstance.fcShippingState.enable();
+          this.#cartInstance.fcState.enable();
 
-        const { results } = await this.#ecommerceInstance.postCreateTransaction({
-          products: this.filteredProducts,
-          reference: this.transactionReference,
-          facturationData: {
-            ...this.#cartInstance.facturationData,
-            id: this.#cartInstance.clientId ?? '',
-          },
-          shippingData: this.#cartInstance.shippingData,
-        });
+          const fgShippingValue = this.#cartInstance.fgShipping.value;
+          this.#cartInstance.fgFacturation.patchValue({
+            ...fgShippingValue,
+            email: this.#cartInstance.fcEmail.value,
+          });
 
-        this.#cartInstance.fcShippingState.disable();
-        this.#cartInstance.fcState.disable();
-        this.#cartInstance.fcFullName.disable();
-
-        if (!results) throw new Error('Results is void');
-
-        this.#cartInstance.transactionId = results['_id'];
-        this.#router.navigate([], {
-          queryParams: {
-            transactionReference: this.transactionReference,
-            transactionId: this.#cartInstance.transactionId,
-          },
-          relativeTo: this.#route,
-        });
-      } catch (error) {
-        console.error('[continue] postCreateTransaction - error', error);
-      } finally {
-        this.isLoading = false;
-      }
-    } else if (this.#cartInstance.transactionId) {
-      try {
-        this.isLoading = true;
-        await this.#ecommerceInstance.patchUpdateTransaction(this.#cartInstance.transactionId, {
-          products: this.filteredProducts,
-          reference: this.transactionReference,
-          facturationData: {
-            ...this.#cartInstance.facturationData,
-            id: this.#cartInstance.clientId ?? '',
-          },
-          shippingData: this.#cartInstance.shippingData,
-        });
-
-        if (this.#cartInstance.fgFacturation.valid) {
-          if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
-            await this.createClient();
-          else await this.updateClient();
-
-          if (this.#cartInstance.clientId)
-            if (this.canFinalize) {
-              await this.payWithWompi();
-              return;
-            } else {
-              this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
-              this.#cartInstance.fgShipping.markAllAsDirty();
-              this.#cartInstance.fgShipping.markAllAsTouched();
-              return;
-            }
-        } else {
-          this.#hotToastInstance.infoNotification('Por favor completa los datos de facturación.');
-          this.#cartInstance.fgFacturation.markAllAsDirty();
-          this.#cartInstance.fgFacturation.markAllAsTouched();
-          return;
-        }
-
-        this.#router.navigate([], {
-          queryParams: {
-            transactionReference: this.transactionReference,
-            transactionId: this.#cartInstance.transactionId,
-          },
-          relativeTo: this.#route,
-        });
-      } catch (error) {
-        console.error('[continue] patchUpdateTransaction - error', error);
-      } finally {
-        this.isLoading = false;
-      }
+          this.#cartInstance.fcShippingState.disable();
+          this.#cartInstance.fcState.disable();
+          const transactionId = await this.createTransaction();
+          await this.continueToLastStep(transactionId);
+        },
+        reject: async () => {
+          this.#cartInstance.fcUseShippingData.patchValue(false);
+          await this.createTransaction();
+        },
+      });
+    } else if (
+      this.#cartInstance.transactionId &&
+      this.#cartInstance.fgShipping.valid &&
+      this.#cartInstance.fcEmail.valid
+    ) {
+      await this.continueToLastStep(this.#cartInstance.transactionId);
     } else {
-      this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
-      this.#cartInstance.fgShipping.markAllAsDirty();
-      this.#cartInstance.fgShipping.markAllAsTouched();
+      if (this.#cartInstance.fgShipping.invalid) {
+        this.#hotToastInstance.infoNotification('Por favor completa los datos de envío.');
+        this.#cartInstance.fgShipping.markAllAsDirty();
+        this.#cartInstance.fgShipping.markAllAsTouched();
+      }
+      if (this.#cartInstance.fcEmail.invalid) {
+        this.#hotToastInstance.infoNotification('Por favor completa los datos de contacto.');
+        this.#cartInstance.fcEmail.markAllAsDirty();
+        this.#cartInstance.fcEmail.markAllAsTouched();
+      }
       return;
     }
   }

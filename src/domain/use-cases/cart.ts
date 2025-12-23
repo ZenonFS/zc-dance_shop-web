@@ -69,18 +69,56 @@ export class Cart {
     return this.cart.products;
   }
 
+  fcUseShippingData = new FormControl(false, [Validators.required]);
+
+  fcShippingKindOfPerson = new FormControl<'PERSON_ENTITY' | 'LEGAL_ENTITY'>('PERSON_ENTITY', [
+    Validators.required,
+  ]);
+  fcShippingNationalId = new FormControl('', [Validators.required]);
+  fcShippingFullName = new FormControl('', [Validators.required]);
+  get shippingFullname() {
+    return this.fcShippingFullName.value ?? '';
+  }
+  fcShippingFirstName = new FormControl('', [Validators.required]);
+  get shippingFirstName() {
+    return this.fcShippingFirstName.value ?? '';
+  }
+  fcShippingSecondName = new FormControl('');
+  get shippingSecondName() {
+    return this.fcShippingSecondName.value ?? '';
+  }
+  fcShippingLastName = new FormControl('', [Validators.required]);
+  get shippingLastName() {
+    return this.fcShippingLastName.value ?? '';
+  }
   fcShippingState = new FormControl('', [Validators.required]);
   fcShippingCity = new FormControl('', [Validators.required]);
+  fcEmail = new FormControl('', [Validators.required]);
 
   fgShipping = new FormGroup({
+    kindOfPerson: this.fcShippingKindOfPerson,
+    nationalId: this.fcShippingNationalId,
+    fullName: this.fcShippingFullName,
+    firstName: this.fcShippingFirstName,
+    secondName: this.fcShippingSecondName,
+    lastName: this.fcShippingLastName,
+
     address: new FormControl('', [Validators.required]),
     city: this.fcShippingCity,
     state: this.fcShippingState,
     phoneNumber: new FormControl('', [Validators.required]),
   });
 
+  get shippingAddress() {
+    return this.fgShipping.controls.address.value;
+  }
+
   get shippingData() {
-    return this.fgShipping.value as IShippingData;
+    return {
+      ...this.fgShipping.value,
+      state: this.fcShippingState.value,
+      fullName: this.shippingFullname,
+    } as IShippingData;
   }
   set shippingData(shippingData: IShippingData) {
     const { cost, ...rest } = shippingData;
@@ -99,18 +137,33 @@ export class Cart {
   ]);
   fcNationalId = new FormControl('', [Validators.required]);
   fcFullName = new FormControl('', [Validators.required]);
+  get fullname() {
+    return this.fcFullName.value ?? '';
+  }
   fcFirstName = new FormControl('', [Validators.required]);
+  get firstName() {
+    return this.fcFirstName.value ?? '';
+  }
   fcSecondName = new FormControl('');
+  get secondName() {
+    return this.fcSecondName.value ?? '';
+  }
   fcLastName = new FormControl('', [Validators.required]);
+  get lastName() {
+    return this.fcLastName.value ?? '';
+  }
   fcAddress = new FormControl('', [Validators.required]);
   fcState = new FormControl('', [Validators.required]);
   fcCity = new FormControl('', [Validators.required]);
   fcPhoneNumber = new FormControl('', [Validators.required]);
-  fcEmail = new FormControl('', [Validators.required]);
-  fcUseShippingData = new FormControl(false, [Validators.required]);
+  get phoneNumber() {
+    return this.fcPhoneNumber.value;
+  }
+  get email() {
+    return this.fcEmail.value;
+  }
 
   fgFacturation = new FormGroup({
-    useShippingData: this.fcUseShippingData,
     kindOfPerson: this.fcKindOfPerson,
     nationalId: this.fcNationalId,
     fullName: this.fcFullName,
@@ -125,7 +178,11 @@ export class Cart {
   });
 
   get facturationData() {
-    return this.fgFacturation.value as IFacturationData;
+    return {
+      ...this.fgFacturation.value,
+      fullName: this.fullname,
+      state: this.fcState.value,
+    } as IFacturationData;
   }
   set facturationData(facturationData: IFacturationData) {
     this.fgFacturation.patchValue(facturationData, { emitEvent: false });
@@ -149,6 +206,81 @@ export class Cart {
 
   constructor() {
     this.getDraft();
+
+    // Shipping Value Changes
+    this.fcShippingKindOfPerson.valueChanges.subscribe((kindOfPerson) => {
+      this.fgFacturation.reset({ kindOfPerson });
+      if (!kindOfPerson) return;
+      if (kindOfPerson === 'LEGAL_ENTITY') {
+        this.fcShippingFirstName.disable();
+        this.fcShippingSecondName.disable();
+        this.fcShippingLastName.disable();
+
+        this.fcShippingFullName.enable();
+        this.fcShippingFullName.addValidators(Validators.required);
+      }
+      if (kindOfPerson === 'PERSON_ENTITY') {
+        this.fcShippingFullName.disable();
+
+        this.fcShippingFirstName.enable();
+        this.fcShippingFirstName.addValidators(Validators.required);
+
+        this.fcShippingSecondName.enable();
+
+        this.fcShippingLastName.enable();
+        this.fcShippingLastName.addValidators(Validators.required);
+      }
+    });
+    this.fcShippingFirstName.valueChanges.subscribe((value) => {
+      this.fcShippingFullName.patchValue(
+        `${value ?? ''} ${this.shippingSecondName} ${this.shippingLastName}`
+      );
+    });
+    this.fcShippingSecondName.valueChanges.subscribe((value) => {
+      this.fcShippingFullName.patchValue(
+        `${this.shippingFirstName} ${value ?? ''} ${this.shippingLastName}`
+      );
+    });
+    this.fcShippingLastName.valueChanges.subscribe((value) => {
+      this.fcShippingFullName.patchValue(
+        `${this.shippingFirstName} ${this.shippingSecondName} ${value ?? ''}`
+      );
+    });
+
+    // Facturation Value Changes
+    this.fcKindOfPerson.valueChanges.subscribe((kindOfPerson) => {
+      this.fgFacturation.reset({ kindOfPerson });
+      if (!kindOfPerson) return;
+      if (kindOfPerson === 'LEGAL_ENTITY') {
+        this.fcFirstName.disable();
+        this.fcSecondName.disable();
+        this.fcLastName.disable();
+
+        this.fcFullName.enable();
+        this.fcFullName.addValidators(Validators.required);
+      }
+      if (kindOfPerson === 'PERSON_ENTITY') {
+        this.fcFullName.disable();
+
+        this.fcFirstName.enable();
+        this.fcFirstName.addValidators(Validators.required);
+
+        this.fcSecondName.enable();
+
+        this.fcLastName.enable();
+        this.fcLastName.addValidators(Validators.required);
+      }
+    });
+
+    this.fcFirstName.valueChanges.subscribe((value) => {
+      this.fcFullName.patchValue(`${value ?? ''} ${this.secondName} ${this.lastName}`);
+    });
+    this.fcSecondName.valueChanges.subscribe((value) => {
+      this.fcFullName.patchValue(`${this.firstName} ${value ?? ''} ${this.lastName}`);
+    });
+    this.fcLastName.valueChanges.subscribe((value) => {
+      this.fcFullName.patchValue(`${this.firstName} ${this.secondName} ${value ?? ''}`);
+    });
   }
 
   async getDraft() {
