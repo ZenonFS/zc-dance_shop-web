@@ -32,7 +32,7 @@ export class Cart {
 
   private readonly cart: { products: IProductCart[] } = { products: [] };
 
-  readonly #defaultValueShippingCost = 12000;
+  readonly #defaultValueShippingCost = 13000;
   #shippingCost = this.#defaultValueShippingCost;
   get shippingCost() {
     return this.#shippingCost === 0 || this.cartTotalPrice > 4000000 ? 0 : this.#shippingCost;

@@ -237,7 +237,7 @@ export class Checkout implements OnInit, AfterViewInit {
       const cityMetadata = this.#cities.get(value);
       if (!cityMetadata || !cityMetadata.state) return;
 
-      if (cityMetadata.postalCode === 'domicilio') this.cartInstance.shippingCost = 12000;
+      if (cityMetadata.postalCode === 'domicilio') this.cartInstance.shippingCost = 13000;
       if (cityMetadata.postalCode === 'interrapidisimo') this.cartInstance.shippingCost = 18000;
 
       this.cartInstance.fcShippingState.patchValue(
