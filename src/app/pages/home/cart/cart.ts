@@ -96,7 +96,7 @@ export class Cart implements OnInit {
 
   get cartTotalPriceInCents() {
     const cartTotalPrice = String(
-      this.#cartInstance.cartTotalPrice + this.#cartInstance.shippingCost
+      this.#cartInstance.cartTotalPrice + this.#cartInstance.shippingCost,
     );
     return cartTotalPrice.padEnd(cartTotalPrice.length + 2, '0');
   }
@@ -243,10 +243,11 @@ export class Cart implements OnInit {
     this.#cartInstance.fcFullName.disable();
 
     try {
+      if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
       this.isLoading = true;
 
       const { results } = await this.#ecommerceInstance.putUpdateClient(
-        <string>this.#cartInstance.clientId,
+        this.#cartInstance.clientId,
         {
           kindOfPerson: 'PERSON_ENTITY',
           identificationObject: {
@@ -269,7 +270,7 @@ export class Cart implements OnInit {
             secondName: secondName ?? '',
             lastName: lastName ?? '',
           },
-        } satisfies UpdateContactDTO
+        } satisfies UpdateContactDTO,
       );
 
       if (!results) throw new Error('Results is void');
@@ -289,12 +290,14 @@ export class Cart implements OnInit {
       this.#cartInstance.fcShippingFullName.enable();
       this.#cartInstance.fcFullName.enable();
 
+      if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
+
       const { results } = await this.#ecommerceInstance.postCreateTransaction({
         products: this.filteredProducts,
         reference: this.transactionReference,
         facturationData: {
           ...this.#cartInstance.facturationData,
-          id: this.#cartInstance.clientId ?? '',
+          id: this.#cartInstance.clientId,
         },
         shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
       });
@@ -319,6 +322,8 @@ export class Cart implements OnInit {
       return results['_id'];
     } catch (error) {
       console.error('[continue] postCreateTransaction - error', error);
+      // Recarga la página después de la navegación
+      window.location.reload();
     } finally {
       this.isLoading = false;
     }
@@ -333,12 +338,14 @@ export class Cart implements OnInit {
       this.#cartInstance.fcShippingFullName.enable();
       this.#cartInstance.fcFullName.enable();
 
+      if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
+
       await this.#ecommerceInstance.patchUpdateTransaction(transactionId, {
         products: this.filteredProducts,
         reference: this.transactionReference,
         facturationData: {
           ...this.#cartInstance.facturationData,
-          id: this.#cartInstance.clientId ?? '',
+          id: this.#cartInstance.clientId,
         },
         shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
       });
@@ -386,6 +393,8 @@ export class Cart implements OnInit {
       });
     } catch (error) {
       console.error('[continue] patchUpdateTransaction - error', error);
+      // Recarga la página después de la navegación
+      window.location.reload();
     } finally {
       this.isLoading = false;
     }
