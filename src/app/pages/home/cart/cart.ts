@@ -331,6 +331,7 @@ export class Cart implements OnInit {
 
   async continueToLastStep(transactionId: string) {
     try {
+      const realTransactionId = this.#cartInstance.transactionId ?? transactionId;
       this.isLoading = true;
 
       this.#cartInstance.fcShippingState.enable();
@@ -338,14 +339,14 @@ export class Cart implements OnInit {
       this.#cartInstance.fcShippingFullName.enable();
       this.#cartInstance.fcFullName.enable();
 
-      if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
+      if (!realTransactionId) throw new Error('Client ID no registrado');
 
-      await this.#ecommerceInstance.patchUpdateTransaction(transactionId, {
+      await this.#ecommerceInstance.patchUpdateTransaction(realTransactionId, {
         products: this.filteredProducts,
         reference: this.transactionReference,
         facturationData: {
           ...this.#cartInstance.facturationData,
-          id: this.#cartInstance.clientId,
+          id: realTransactionId,
         },
         shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
       });
@@ -356,11 +357,11 @@ export class Cart implements OnInit {
       this.#cartInstance.fcFullName.disable();
 
       if (this.#cartInstance.fgFacturation.valid) {
-        if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId)
+        if (this.#cartInstance.isNewClient && !realTransactionId)
           await this.createClient();
         else await this.updateClient();
 
-        if (this.#cartInstance.clientId)
+        if (realTransactionId)
           if (this.canFinalize) {
             await this.payWithWompi();
             return;
