@@ -249,7 +249,7 @@ export class Cart {
 
     // Facturation Value Changes
     this.fcKindOfPerson.valueChanges.subscribe((kindOfPerson) => {
-      this.fgFacturation.reset({ kindOfPerson });
+      this.fgFacturation.reset({ kindOfPerson }, {emitEvent: false});
       if (!kindOfPerson) return;
       if (kindOfPerson === 'LEGAL_ENTITY') {
         this.fcFirstName.disable();

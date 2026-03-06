@@ -173,7 +173,6 @@ export class Cart implements OnInit {
     const {
       address,
       city,
-      email,
       fullName,
       nationalId,
       phoneNumber,
@@ -181,7 +180,7 @@ export class Cart implements OnInit {
       firstName,
       secondName,
       lastName,
-    } = this.#cartInstance.facturationData;
+    } = this.#cartInstance.shippingData;
 
     this.#cartInstance.fcState.disable();
     this.#cartInstance.fcFullName.disable();
@@ -195,7 +194,7 @@ export class Cart implements OnInit {
         },
         mobile:
           phoneNumber?.replace('(', '').replace(')', '').replace('-', '').replaceAll(' ', '') ?? '',
-        email: email ?? '',
+        email: this.#cartInstance.fcEmail.value ?? '',
         address: {
           address: address ?? '',
           city: city ?? '',
@@ -229,7 +228,6 @@ export class Cart implements OnInit {
     const {
       address,
       city,
-      email,
       fullName,
       nationalId,
       phoneNumber,
@@ -237,7 +235,7 @@ export class Cart implements OnInit {
       firstName,
       secondName,
       lastName,
-    } = this.#cartInstance.facturationData;
+    } = this.#cartInstance.shippingData;
 
     this.#cartInstance.fcState.disable();
     this.#cartInstance.fcFullName.disable();
@@ -257,7 +255,7 @@ export class Cart implements OnInit {
           mobile:
             phoneNumber?.replace('(', '').replace(')', '').replace('-', '').replaceAll(' ', '') ??
             '',
-          email: email ?? '',
+          email: this.#cartInstance.fcEmail.value ?? '',
           address: {
             address: address ?? '',
             city: city ?? '',
@@ -290,14 +288,12 @@ export class Cart implements OnInit {
       this.#cartInstance.fcShippingFullName.enable();
       this.#cartInstance.fcFullName.enable();
 
-      if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
-
       const { results } = await this.#ecommerceInstance.postCreateTransaction({
         products: this.filteredProducts,
         reference: this.transactionReference,
         facturationData: {
           ...this.#cartInstance.facturationData,
-          id: this.#cartInstance.clientId,
+          id: this.#cartInstance.clientId ?? '',
         },
         shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
       });
@@ -315,7 +311,6 @@ export class Cart implements OnInit {
           transactionReference: this.transactionReference,
           transactionId: this.#cartInstance.transactionId,
         },
-        fragment: 'target-section',
         relativeTo: this.#route,
       });
 
@@ -339,14 +334,12 @@ export class Cart implements OnInit {
       this.#cartInstance.fcShippingFullName.enable();
       this.#cartInstance.fcFullName.enable();
 
-      if (!realTransactionId) throw new Error('Client ID no registrado');
-
       await this.#ecommerceInstance.patchUpdateTransaction(realTransactionId, {
         products: this.filteredProducts,
         reference: this.transactionReference,
         facturationData: {
           ...this.#cartInstance.facturationData,
-          id: realTransactionId,
+          id: this.#cartInstance.clientId ?? '',
         },
         shippingData: { ...this.#cartInstance.shippingData, cost: this.#cartInstance.shippingCost },
       });
@@ -357,9 +350,23 @@ export class Cart implements OnInit {
       this.#cartInstance.fcFullName.disable();
 
       if (this.#cartInstance.fgFacturation.valid) {
-        if (this.#cartInstance.isNewClient && !realTransactionId)
-          await this.createClient();
+        if (this.#cartInstance.isNewClient && !this.#cartInstance.clientId) await this.createClient();
         else await this.updateClient();
+
+        if (!this.#cartInstance.clientId) throw new Error('Client ID no registrado');
+
+        await this.#ecommerceInstance.patchUpdateTransaction(realTransactionId, {
+          products: this.filteredProducts,
+          reference: this.transactionReference,
+          facturationData: {
+            ...this.#cartInstance.facturationData,
+            id: this.#cartInstance.clientId,
+          },
+          shippingData: {
+            ...this.#cartInstance.shippingData,
+            cost: this.#cartInstance.shippingCost,
+          },
+        });
 
         if (realTransactionId)
           if (this.canFinalize) {
@@ -395,7 +402,7 @@ export class Cart implements OnInit {
     } catch (error) {
       console.error('[continue] patchUpdateTransaction - error', error);
       // Recarga la página después de la navegación
-      window.location.reload();
+      // window.location.reload();
     } finally {
       this.isLoading = false;
     }
