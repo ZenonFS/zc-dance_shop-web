@@ -35,10 +35,24 @@ export class Cart {
   readonly #defaultValueShippingCost = 13000;
   #shippingCost = this.#defaultValueShippingCost;
   get shippingCost() {
-    return this.#shippingCost === 0 || this.cartTotalPrice > 4000000 ? 0 : this.#shippingCost;
+    return this.#shippingCost === 0 || this.cartTotalPrice >= 400000 ? 0 : this.#shippingCost;
   }
   set shippingCost(value: number) {
     this.#shippingCost = value;
+  }
+
+  get discountPercentage(): number {
+    if (this.cartTotalPrice >= 1500000) return 10;
+    if (this.cartTotalPrice >= 800000) return 5;
+    return 0;
+  }
+
+  get discountAmount(): number {
+    return Math.round(this.cartTotalPrice * (this.discountPercentage / 100));
+  }
+
+  get cartTotalWithDiscount(): number {
+    return this.cartTotalPrice - this.discountAmount;
   }
 
   get cartTotalPrice(): number {

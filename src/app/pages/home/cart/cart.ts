@@ -67,7 +67,7 @@ export class Cart implements OnInit {
   }
 
   get shippingCostToString() {
-    return this.#cartInstance.cartTotalPrice > 400000
+    return this.#cartInstance.cartTotalPrice >= 400000
       ? 'Gratis'
       : this.#currencyPipe.transform(this.#cartInstance.shippingCost);
   }
@@ -75,10 +75,17 @@ export class Cart implements OnInit {
     return this.#cartInstance.cartTotalPrice;
   }
 
+  get discountPercentage() {
+    return this.#cartInstance.discountPercentage;
+  }
+  get discountAmount() {
+    return this.#cartInstance.discountAmount;
+  }
+
   get cartTotal() {
-    return this.#cartInstance.cartTotalPrice <= 400000
-      ? this.#cartInstance.cartTotalPrice + this.#cartInstance.shippingCost
-      : this.#cartInstance.cartTotalPrice;
+    return this.#cartInstance.cartTotalPrice < 400000
+      ? this.#cartInstance.cartTotalWithDiscount + this.#cartInstance.shippingCost
+      : this.#cartInstance.cartTotalWithDiscount;
   }
 
   get cartTotalProducts() {
@@ -96,7 +103,7 @@ export class Cart implements OnInit {
 
   get cartTotalPriceInCents() {
     const cartTotalPrice = String(
-      this.#cartInstance.cartTotalPrice + this.#cartInstance.shippingCost,
+      this.#cartInstance.cartTotalWithDiscount + this.#cartInstance.shippingCost,
     );
     return cartTotalPrice.padEnd(cartTotalPrice.length + 2, '0');
   }
