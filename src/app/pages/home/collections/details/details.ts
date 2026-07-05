@@ -121,6 +121,31 @@ export class Details implements OnInit {
     );
   }
 
+  get maxAvailableQuantity() {
+    if (!this._product) return 0;
+
+    if (this._product.type === 'variantParent') {
+      if (this.visible && this.selectedVariant) {
+        const variant = this._product.variants.find(({ id }) => this.selectedVariant === id);
+        if (variant) return variant.inventory.availableQuantity;
+      }
+
+      if (this.sizeSelectRef?.value && this.colorSelectRef?.value && this.hasColors) {
+        const variant = this._product.variants.find(({ name }) =>
+          name.includes(`/ ${this.sizeSelectRef.value} / ${this.colorSelectRef.value}`)
+        );
+        if (variant) return variant.inventory.availableQuantity;
+      } else if (this.sizeSelectRef?.value && !this.colorSelectRef?.value && !this.hasColors) {
+        const variant = this._product.variants.find(({ name }) =>
+          name.includes(`/ ${this.sizeSelectRef.value}`)
+        );
+        if (variant) return variant.inventory.availableQuantity;
+      }
+      return 0;
+    }
+    return this._product.inventory.availableQuantity;
+  }
+
   selectedVariant!: string;
   visible: boolean = false;
   onChanging = false;

@@ -103,6 +103,17 @@ export class ProductCard implements IProduct {
 
   amount = 1;
 
+  get maxAvailableQuantity() {
+    if (this.type === 'variantParent') {
+      if (this.selectedVariant) {
+        const variant = this.#variants.find(({ id }) => this.selectedVariant === id);
+        return variant?.inventory.availableQuantity ?? 0;
+      }
+      return 0;
+    }
+    return this.quantityAvalible;
+  }
+
   get btnLabel() {
     return this.type === 'variantParent' ? 'Seleccionar opciones' : 'Agregar al carrito';
   }
@@ -111,7 +122,7 @@ export class ProductCard implements IProduct {
     private readonly cart: Cart,
     private readonly ecommerceInstance: EcommerceService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
   ) {}
 
   async #getVariants(reference: string) {
@@ -129,7 +140,7 @@ export class ProductCard implements IProduct {
               .slice(1)
               .join(' / '),
             isDisabled: false,
-          } satisfies IOptions)
+          }) satisfies IOptions,
       );
     }
   }
